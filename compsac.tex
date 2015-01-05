@@ -74,37 +74,41 @@ Modular applications; Hot deployment; Dependency Reconstruction; Class Loading.
 
 
 \section{Introduction\label{sec:introduction}}
-The concept of modularity was proposed a long time ago by Divid Parnas\cite{Divid_specification}.
-He gave two main criteria\cite{Divid_criteria} to be used in decomposing systems into modules in 1972.
-They were making each major step in the processing module and using information hiding as a criterion.
-After that, people gradually changed the way of developing software.
-And Modularity impacts on development, deployment, operation, maintenance in software engineering until now.
-So, many researchers focus on modularity and modular applications in all fields of software engineering, such as software metric\cite{module_metric} and software testing\cite{module_test}.
-Even some new technologies and concepts(e.g. AOP\cite{module_aop} and cloud\cite{module_cloud}) of software engineering also have related to modularity and modular applications.
 
-In a word, modularity and modular applications can be found everywhere and they are generally accepted by researchers and software developers.
-But there are two problems in modular applications which we have to face.
-The one is isolation and sharing between modules and we call it isolation-sharing problem. 
-Developers must consider how to isolate core modules and how to share general modules.
-The other problem that we call it update-maintenance problem is related to software maintenance.
-How to update and maintain different module versions and replace modules flexibly is quite a hard problem.
+Nowadays application servers provide platforms for enterprise applications to be deployed, operated and maintained. They usually contain comprehensive services, such as clustering, security and transaction management, et. al, so that developers can focus on the business logic. As one one of those sophisticated services, hot deployment enables the server to put applications into production without restarting the server itself. By hot deployment, the existing application can be upgraded in this fashion as well.
 
-Fortunately, Application Servers\cite{app_server} provide a platform to run modular applications.
-They solve isolation-sharing problem through internal application server class loader. 
-They support hot deployment of standalone applications, so that applications in the servers can be updated flexibly without restarting application servers.
-The technology of hot deployment highly improves the efficiency and flexibility of the application server deployment.
-It becomes one of the typical features of mainstream application servers, such as JBossAS\cite{jboss}, which play a significant role in the development of enterprise applications.
-However, It is supposed that hot deployed software package is closed or self-contained.
-But modular software is the essential requirement in the application development and modular enterprise applications with dependencies are ubiquitous.
-If some modules of an application are hot deployed with the new versions, failures may happen because of the dependency loss.
-And finally, it impacts on reliability of application servers\cite{middleware_reliability}.
+The technology of hot deployment highly improves the efficiency and flexibility of the application servers.
+It becomes one of the typical features of mainstream application server products, such as JBossAS\cite{jboss} and \textcolor{red}{xxxx}, which play a significant role in the development of enterprise applications. By the philosophy of design of the application servers, the units to be deployed, in packages (or modulars) of ear/war/jar, are standalone applications, which means they are closed and self-contained. This implicit assumption does not prohibit the developers to build the applications that spans multiple packages with internal dependencies. Applications in this case can still work as long as the referencing across different deployment units are supported. As a matter of fact, the unit deploying mechanisms built in the application servers like JBoss do make this happen with appropriate class loader designed.  \textcolor{red}{(we should explain how the dependencies are constructed during the first time deployment here)}
 
-To solve the problem, all the dependent modules must be redeployed after deployment of depended modules in manual or semi-automatic manner.
-That means application servers should manage and maintain dependencies of all the modules that are deployed in it.
-In this way, dependencies are reconstructed and dependent modules will be handled through plenty of steps from the deployment process.
-Actually, depended modules are the updated modules and updating dependent modules is just for reconstruct dependencies.
-This causes application servers inefficient and also causes hot deployment inflexibility.
-In this paper, we analyze reasons of failures and a technology of hot deployment with dependency reconstruction is introduced.
+Applications in multiple packages, which are called as \emph{modular applications}, are common when they are developed by different individuals collaboratively or assembled with third-party libraries that are already packed independently. They still works fine on application servers until some portion of the application is about to be hot deployed  with the new versions. As the application server treats the packages as isolated ones, it ignores the existents of potential relationships among the modulars. Failures may happen because of the original dependencies between the portion to be hot deployed and the rest of the application are broken and applications are actually down.
+
+To solve the problem, the dependencies need to be reconstructed. Intuitively, this can be done manually. The developer should have the knowledge of dependent configuration among the application modulars and be aware the affection scope of the redeployment. Then they can redeploy the dependent ones by hand. However, this requires human interaction can be  strenuous and even error-prone, especially for large-scale application. Alternatively, they can also redeploy all the modulars for that application. But it is not only unnecessary but also cause the state of unaffected part to be destructed \textcolor{red}{(give one example here .... )}. 
+
+
+In this paper, we introduce a general approach to enable the correct hot deployment respecting the dependencies among modulars. The dependencies are constructed with  class loaders for the modulars and upon the dependent modulars can be calculated and  their hot deployment can be triggered. ...
+
+% Application servers can also carry out the redeploy process automatically as . In this way, dependencies are reconstructed and dependent modules will be handled through plenty of steps from the deployment process. Actually, depended modules are the updated modules and updating dependent modules is just for reconstruct dependencies.
+%This causes application servers inefficient and also causes hot deployment inflexibility.
+
+
+%The concept of modularity was proposed a long time ago by Divid Parnas\cite{Divid_specification}.
+%He gave two main criteria\cite{Divid_criteria} to be used in decomposing systems into modules in 1972.
+%They were making each major step in the processing module and using information hiding as a criterion.
+%After that, people gradually changed the way of developing software.
+%And Modularity impacts on development, deployment, operation, maintenance in software engineering until now.
+%So, many researchers focus on modularity and modular applications in all fields of software engineering, such as software metric\cite{module_metric} and software testing\cite{module_test}.
+%Even some new technologies and concepts(e.g. AOP\cite{module_aop} and cloud\cite{module_cloud}) of software engineering also have related to modularity and modular applications.
+
+%In a word, modularity and modular applications can be found everywhere and they are generally accepted by researchers and software developers.
+%But there are two problems in modular applications which we have to face.
+%The one is isolation and sharing between modules and we call it isolation-sharing problem. 
+%Developers must consider how to isolate core modules and how to share general modules.
+%The other problem that we call it update-maintenance problem is related to software maintenance.
+%How to update and maintain different module versions and replace modules flexibly is quite a hard problem.
+
+
+
+%In this paper, we analyze reasons of failures and a technology of hot deployment with dependency reconstruction is introduced.
 In order to update flexibly and efficiently, we put dependency management and maintenance in module class loaders.
 Dependency reconstruction will be done in the class loaders, so that dependent modules only update their class loaders and they don't need to do anything else except class loading in the process of redeployment.
 
