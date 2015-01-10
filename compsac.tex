@@ -48,10 +48,10 @@
 
 \title{Hot Deployment with Dependency Reconstruction}
 
-\author{\IEEEauthorblockN{Haicheng Li, Chun Cao, Xiaoxing Ma, Jian Lu}
+\author{\IEEEauthorblockN{Haicheng Li, Chun Cao,  Ping Yu}
 \IEEEauthorblockA{State Key Lab for Novel Software Technology, Nanjing University, Nanjing, China\\
 Dept. of Computer Science and Technology, Nanjing University, Nanjing, China\\
-lhc\_happy@sina.cn, caochun@gmail.com, \{xxm, lj\}@nju.edu.cn}
+lhc\_happy@sina.cn, \{caochun, yuping\}@nju.edu.cn}
 }
 
 % make the title area
@@ -70,7 +70,7 @@ Experiments show that our technology of hot deployment can ensure the correctnes
 \end{abstract}
 
 \begin{IEEEkeywords}
-Modular applications; Hot deployment; Dependency Reconstruction; Class Loading.
+Hot deployment; Dependency reconstruction; Class loading.
 \end{IEEEkeywords}
 
 
@@ -89,7 +89,9 @@ Applications in multiple packages, which are called as \emph{modular application
 To solve the problem, the dependencies need to be reconstructed. Intuitively, this can be done manually. The developer should have the knowledge of dependent configuration among the application modules and be aware the affection scope of the redeployment. Then they can redeploy the dependent ones by hand. However, this requires human intervention can be strenuous and even error-prone, especially for large-scale application. Alternatively, they can also redeploy all the modules for that application. But it is not only unnecessary but also cause the state of unaffected part to be destructed, such as data storage module which is hardly updated. 
 
 
-In this paper, we introduce a general approach to enable the correct hot deployment respecting the dependencies among modulars. The dependencies are constructed with  class loaders for the modulars and upon the dependent modulars can be calculated and  their hot deployment can be triggered. ...
+In this paper, we introduce a general approach to enable the correct hot deployment respecting the dependencies among modulars. The dependencies are constructed with  class loaders for the modulars and upon the dependent modulars can be calculated and  their hot deployment can be triggered. ... In order to update flexibly and efficiently, we put dependency management and maintenance in module class loaders. Dependency reconstruction will be done in the class loaders, so that dependent modules only update their class loaders and they don't need to do anything else except class loading in the process of redeployment.
+
+
 
 % Application servers can also carry out the redeploy process automatically as . In this way, dependencies are reconstructed and dependent modules will be handled through plenty of steps from the deployment process. Actually, depended modules are the updated modules and updating dependent modules is just for reconstruct dependencies.
 %This causes application servers inefficient and also causes hot deployment inflexibility.
@@ -104,9 +106,6 @@ In this paper, we introduce a general approach to enable the correct hot deploym
 
 
 %In this paper, we analyze reasons of failures and a technology of hot deployment with dependency reconstruction is introduced.
-In order to update flexibly and efficiently, we put dependency management and maintenance in module class loaders.
-Dependency reconstruction will be done in the class loaders, so that dependent modules only update their class loaders and they don't need to do anything else except class loading in the process of redeployment.
-
 The rest of this paper is organized as follow. 
 Section \ref{sec:background} defines the dependencies of modular applications and analyzes reasons of failures based on hot deployment mechanism. 
 Section \ref{sec:approach} discuss disadvantages of dependency reconstruction in application servers and describes our approach of dependency reconstruction in module class loaders.
@@ -114,10 +113,7 @@ We give the evaluations in Section \ref{sec:evaluation} and Section \ref{sec:rel
 Lastly in Section \ref{sec:conclusion}, we conclude this paper and discuss future work.
 
 \section{Background\label{sec:background}}
-In this section, hot deployment mechanism is described. 
-We talk about how application servers hot deploy modules with its internal class loading mechanism. 
-To explain dependencies in modular applications, we define dependencies of modules and we use the definition in our approach. 
-Moreover, we give reasons why dependencies may be lost and failures may happen when running modular applications in a mainstream application server.
+In this section, the hot deployment mechanism of current application servers are reviewed. We also analyze  the cause of the failure in hot deploying the modular applications.
 
 \subsection{Hot Deployment}
 
@@ -128,45 +124,42 @@ Moreover, we give reasons why dependencies may be lost and failures may happen w
 \label{fig:jboss_class_loader}
 \end{figure}
 
-In the J2EE\cite{j2ee} field, mainstream application servers, such as JBoss, have abilities to hot deploy and hot undeploy.
-When applications running in an application server need to be updated, hot deployment technology makes server not restart to guarantee the operation of other applications. 
-In order to pursue dynamics of programs and hot deployment, standard class loader\cite{standard_cl} architecture must be destroyed.
-That is because it has a main (share) class loader to load all of the application classes. 
-Updating online some applications leads to the update of the main class loader, so that other applications will be affected. 
+Hot deployment built in mainstream application servers enables applications on the servers to be are published, updated or withdrawn without restarting the servers. This feature is based on the a class loading mechanism in  beyond the standard class loaders in Java system. Conceptionally, each module, as an standard alone application, to be deployed has its own class loader instead of sharing one with other modules so that standalone applications in that module can be independently operated. All the effective module class loaders are organized together (in a chain or pool) so that they can find each other be delegate to load classes and resources which enables the mutual referring and sharing among the modules. When some module are hot deployed, the corresponding module class loader will be removed and a new one will be created to load the new version of the module. In this way, application servers complete hot deployment of applications\cite{module_cl}.
 
-The new architecture using module class loader chain can support hot deployment of standalone applications. 
-In this chain, each module has its own class loader instances and cache. Under this mechanism, each module class loader is independent. 
-When hot deploying, the corresponding module class loader in the chain will be removed and a new version of the module class loader will be created.
-In this way, application servers ensure consistency of the application versions and complete hot deployment of applications\cite{module_cl}.
 
-This class loading mechanism is used in many mainstream application servers. 
-Fig.\ref{fig:jboss_class_loader} gives an overview of class loader architecture in JBoss that supports hot deployment. 
-\emph{Sytem ClassLoaders} and \emph{ServerLoader} are loading JBoss server and its library. 
-\emph{Web ENCLoader} and \emph{War Loader} are responsible for loading web applications and \emph{EJB DynClassLoader} and \emph{EJB ENCLoader} are responsible for loading EJB applications. 
-The most important class loader is \emph{UnifiedClassLoader}, which covers EARs, JARs, WARs, SARs and directories seen by the deployment scanner as well as JARs referenced by their manifests and any nested deployment units they may contain\cite{jboss_class_loader}. 
-Because each \emph{UnifiedClassLoader} is responsible for only one module, it is just a module class loader which helps JBoss achieve hot deployment.
+Figure \ref{fig:jboss_class_loader}  shows an illustrative architecture of class loading in JBoss and other application servers adopt similar designs. As for JBoss, \emph{Sytem ClassLoaders} and \emph{ServerLoader} are responsible to load JBoss server itself. \emph{Web ENCLoader} and \emph{War Loader} are responsible for loading web applications and \emph{EJB DynClassLoader} and \emph{EJB ENCLoader} are responsible for loading EJB applications respectively. \textcolor{red}{The most important class loader is \emph{UnifiedClassLoader}, which covers EARs, JARs, WARs, SARs and directories seen by the deployment scanner as well as JARs referenced by their manifests and any nested deployment units they may contain\cite{jboss_class_loader}.} Because each \emph{UnifiedClassLoader} instance is responsible for only one module, it is just a module class loader which helps JBoss achieve hot deployment.
+
+
+%However, the standard class loader\cite{standard_cl} architecture  be destroyed.
+%That is because it has a main (share) class loader to load all of the application classes. 
+%Updating online some applications leads to the update of the main class loader, so that other applications will be affected. 
+
+%The new architecture using module class loader chain can support hot deployment of standalone applications. 
+%In this chain, each module has its own class loader instances and cache. Under this mechanism, each module class loader is independent. 
+
+
+%This class loading mechanism is used in many mainstream application servers. 
+%Fig.\ref{fig:jboss_class_loader} gives an overview of class loader architecture in JBoss that supports hot deployment. 
 
 
 \subsection{Define of Dependencies} 
 
-A modular application may contain plenty of modules and a module may contain plenty of classes.
-Dependencies in modular applications can be treated as dependencies of its different modules.
-The module is defined as $M=<C, R, L>$, which means a set of classes $C=\{c_1, c_2, c_3\cdots\}$ and a set of related modules $R=\{M_1, M_2, M_3\cdots\}$.
-$L$ is a module class loader to load all the classes in the class set $C$.
-We use it to describe dependencies of modules.
-And dependency $R$ of module $M$ can be created in the following way.
-$$R=\{M_1=<C_1, R_1, L_1> \mid \exists c_1 \in C, c_2 \in C_1, c_1 \rightarrow c_2\}$$
+A modular application may contain more than one module which is consisted of one or more classes. 
+%Dependencies in modular applications can be treated as dependencies of its different modules.
+A module can be defined as $M=<C, R, L>$. $C=\{c_1, c_2, c_3\cdots\}$  is the set of classes in that module. $L$ is a module class loader to load all the classes in the class set $C$. $R=\{M_1, M_2, M_3\cdots\}$ is the set of its dependency against other modules. 
+\textcolor{red}{$$R=\{M_1=<C_1, R_1, L_1> \mid \exists c_1 \in C, c_2 \in C_1, c_1 \rightarrow c_2\}$$
 The "$\rightarrow$" means import, that is to say, class $c_1$ in class set of module $M$ may inherit, create or invoke class $c_2$ in class set of module $M_1$. 
 So if $R=\emptyset$, $M$ doesn't depends any modules.
 Otherwise, $M$ depends all of modules in $R$.
+}
 
-$L$ is a module class loader of module $M$ and it is responsible for loading all the classes of $M$. 
+\textcolor{red}{$L$ is a module class loader of module $M$ and it is responsible for loading all the classes of $M$. 
 Because of the dependencies of $M$, $M$ may depends on other modules. 
 In this case, only class loader $L$ cannot load some classes which depend on the classes in the other modules. 
 So class loader $L$ will delegate the class loaders in the depended modules to load the classes. 
 Meanwhile, class loader $L$ may help other module class loader to load other classes which are in the different modules and depend on the classes in module $M$. 
 This is the dependencies of module class loaders. 
-According to the definition, the dependencies of modules are also the dependencies of their class loaders and we will use this property in our approach.
+According to the definition, the dependencies of modules are also the dependencies of their class loaders and we will use this property in our approach.}
 
 
 \subsection{Reasons of Failures}

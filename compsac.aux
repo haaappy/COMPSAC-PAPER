@@ -1,4 +1,5 @@
 \relax 
+\providecommand\hyper@newdestlabel[2]{}
 \providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
 \HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
 \global\let\oldcontentsline\contentsline
@@ -14,17 +15,17 @@
 \global\let\hyper@last\relax 
 \gdef\HyperFirstAtBeginDocument#1{#1}
 \providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
 \citation{app_server}
 \citation{jboss}
 \citation{weblogic}
 \citation{middleware_reliability}
-\newlabel{sec:introduction}{{I}{1}{Introduction\relax }{section.1}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{section.1}}
-\newlabel{sec:background}{{II}{1}{Background\relax }{section.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {II}Background}{1}{section.2}}
-\citation{j2ee}
-\citation{standard_cl}
 \citation{module_cl}
+\newlabel{sec:introduction}{{I}{1}{Introduction}{section.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{section.1}}
+\newlabel{sec:background}{{II}{1}{Background}{section.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {II}Background}{1}{section.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\unhbox \voidb@x \hbox {II-A}}Hot Deployment}{1}{subsection.2.1}}
 \citation{jboss_class_loader}
 \citation{DI}
 \citation{EJB}
@@ -32,52 +33,51 @@
 \citation{jvm_book}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces class loader architecture in JBoss\relax }}{2}{figure.caption.1}}
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:jboss_class_loader}{{1}{2}{class loader architecture in JBoss\relax \relax }{figure.caption.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\unhbox \voidb@x \hbox {II-A}}Hot Deployment}{2}{subsection.2.1}}
+\newlabel{fig:jboss_class_loader}{{1}{2}{class loader architecture in JBoss\relax }{figure.caption.1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\unhbox \voidb@x \hbox {II-B}}Define of Dependencies}{2}{subsection.2.2}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\unhbox \voidb@x \hbox {II-C}}Reasons of Failures}{2}{subsection.2.3}}
 \citation{jvm_specification}
 \citation{deployment_process}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces details of loading classes\relax }}{3}{figure.caption.2}}
-\newlabel{fig:example}{{2}{3}{details of loading classes\relax \relax }{figure.caption.2}{}}
+\newlabel{fig:example}{{2}{3}{details of loading classes\relax }{figure.caption.2}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces the main source code of two session beans\relax }}{3}{figure.caption.3}}
-\newlabel{fig:ejb_source_code}{{3}{3}{the main source code of two session beans\relax \relax }{figure.caption.3}{}}
-\newlabel{sec:approach}{{III}{3}{Approach\relax }{section.3}{}}
+\newlabel{fig:ejb_source_code}{{3}{3}{the main source code of two session beans\relax }{figure.caption.3}{}}
+\newlabel{sec:approach}{{III}{3}{Approach}{section.3}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {III}Approach}{3}{section.3}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\unhbox \voidb@x \hbox {III-A}}Reconstruction in Application Servers}{3}{subsection.3.1}}
 \citation{parent_delegation}
 \citation{class_loader_patent}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\unhbox \voidb@x \hbox {III-B}}Reconstruction in Class Loaders}{4}{subsection.3.2}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces function loadClass of CDR Class Loader\relax }}{4}{algorithm.1}}
+\newlabel{alg:CDR_Class_Loader}{{1}{4}{function loadClass of CDR Class Loader\relax }{algorithm.1}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\unhbox \voidb@x \hbox {III-B}1}CDR Class Loader}{4}{ALC@unique.10}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces function loadClass of CDR Class Loader\relax }}{5}{algorithm.1}}
-\newlabel{alg:CDR_Class_Loader}{{1}{5}{function loadClass of CDR Class Loader\relax \relax }{algorithm.1}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\unhbox \voidb@x \hbox {III-B}2}ADR Class Loader}{5}{figure.caption.5}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces hot deployment process\relax }}{5}{figure.caption.4}}
-\newlabel{fig:deployment_process}{{4}{5}{hot deployment process\relax \relax }{figure.caption.4}{}}
-\newlabel{fig:subfig:a}{{5a}{6}{Subfigure 5a\relax }{subfigure.5.1}{}}
+\newlabel{fig:deployment_process}{{4}{5}{hot deployment process\relax }{figure.caption.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\unhbox \voidb@x \hbox {III-B}2}ADR Class Loader}{5}{figure.caption.5}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {\unhbox \voidb@x \hbox {III-B}3}ADRD Class Loader}{5}{ALC@unique.35}}
+\newlabel{fig:subfig:a}{{5a}{6}{Subfigure 5a}{subfigure.5.1}{}}
 \newlabel{sub@fig:subfig:a}{{(a)}{a}{Subfigure 5a\relax }{subfigure.5.1}{}}
-\newlabel{fig:subfig:b}{{5b}{6}{Subfigure 5b\relax }{subfigure.5.2}{}}
+\newlabel{fig:subfig:b}{{5b}{6}{Subfigure 5b}{subfigure.5.2}{}}
 \newlabel{sub@fig:subfig:b}{{(b)}{b}{Subfigure 5b\relax }{subfigure.5.2}{}}
-\newlabel{fig:subfig:c}{{5c}{6}{Subfigure 5c\relax }{subfigure.5.3}{}}
+\newlabel{fig:subfig:c}{{5c}{6}{Subfigure 5c}{subfigure.5.3}{}}
 \newlabel{sub@fig:subfig:c}{{(c)}{c}{Subfigure 5c\relax }{subfigure.5.3}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces details of loading classes via ADR Class Loader\relax }}{6}{figure.caption.5}}
+\newlabel{fig:loading_queue}{{5}{6}{details of loading classes via ADR Class Loader\relax }{figure.caption.5}{}}
 \@writefile{lof}{\contentsline {subfigure}{\numberline{(a)}{\ignorespaces {loading ComputeBean}}}{6}{subfigure.5.1}}
 \@writefile{lof}{\contentsline {subfigure}{\numberline{(b)}{\ignorespaces {loading ValidatorBean}}}{6}{subfigure.5.2}}
 \@writefile{lof}{\contentsline {subfigure}{\numberline{(c)}{\ignorespaces {loading ComputeBean again}}}{6}{subfigure.5.3}}
-\newlabel{fig:loading_queue}{{5}{6}{details of loading classes via ADR Class Loader\relax \relax }{figure.caption.5}{}}
 \@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces function loadClass of ADRD Class Loader\relax }}{6}{algorithm.2}}
-\newlabel{alg:ADRD_Class_Loader}{{2}{6}{function loadClass of ADRD Class Loader\relax \relax }{algorithm.2}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\unhbox \voidb@x \hbox {III-B}3}ADRD Class Loader}{6}{ALC@unique.35}}
+\newlabel{alg:ADRD_Class_Loader}{{2}{6}{function loadClass of ADRD Class Loader\relax }{algorithm.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\unhbox \voidb@x \hbox {III-C}}Contribution}{6}{subsection.3.3}}
-\newlabel{sec:evaluation}{{IV}{6}{Evaluation\relax }{section.4}{}}
+\newlabel{sec:evaluation}{{IV}{6}{Evaluation}{section.4}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {IV}Evaluation}{6}{section.4}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\unhbox \voidb@x \hbox {IV-A}}Correctness}{6}{subsection.4.1}}
 \citation{jsr88}
 \citation{java_pet_store}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\unhbox \voidb@x \hbox {IV-B}}Efficiency}{7}{subsection.4.2}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces A-JAR.xml file\relax }}{7}{figure.caption.8}}
-\newlabel{fig:xml_pic}{{6}{7}{A-JAR.xml file\relax \relax }{figure.caption.8}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\unhbox \voidb@x \hbox {IV-C}}Dynamic Feature}{7}{subsection.4.3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces A-JAR.xml file\relax }}{7}{figure.caption.8}}
+\newlabel{fig:xml_pic}{{6}{7}{A-JAR.xml file\relax }{figure.caption.8}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\unhbox \voidb@x \hbox {IV-D}}Flexibility}{7}{subsection.4.4}}
 \citation{Divid_specification}
 \citation{Divid_criteria}
@@ -93,15 +93,15 @@
 \citation{related_merge}
 \citation{related_split}
 \citation{future_Gu}
-\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces time cost of redeployment\relax }}{8}{table.caption.6}}
-\newlabel{tab:stage}{{I}{8}{time cost of redeployment\relax \relax }{table.caption.6}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces performance of flexibile reconstruction\relax }}{8}{table.caption.7}}
-\newlabel{tab:flexibility}{{II}{8}{performance of flexibile reconstruction\relax \relax }{table.caption.7}{}}
-\newlabel{sec:relatedwork}{{V}{8}{Related work\relax }{section.5}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {V}Related work}{8}{section.5}}
-\newlabel{sec:conclusion}{{VI}{8}{Conclusion and future work\relax }{section.6}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {VI}Conclusion and future work}{8}{section.6}}
 \bibcite{app_server}{1}
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces time cost of redeployment\relax }}{8}{table.caption.6}}
+\newlabel{tab:stage}{{I}{8}{time cost of redeployment\relax }{table.caption.6}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces performance of flexibile reconstruction\relax }}{8}{table.caption.7}}
+\newlabel{tab:flexibility}{{II}{8}{performance of flexibile reconstruction\relax }{table.caption.7}{}}
+\newlabel{sec:relatedwork}{{V}{8}{Related work}{section.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {V}Related work}{8}{section.5}}
+\newlabel{sec:conclusion}{{VI}{8}{Conclusion and future work}{section.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Conclusion and future work}{8}{section.6}}
 \bibcite{jboss}{2}
 \bibcite{weblogic}{3}
 \bibcite{middleware_reliability}{4}
