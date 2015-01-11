@@ -115,6 +115,27 @@ Lastly in Section \ref{sec:conclusion}, we conclude this paper and discuss futur
 \section{Background\label{sec:background}}
 In this section, the hot deployment mechanism of current application servers are reviewed. We also analyze  the cause of the failure in hot deploying the modular applications.
 
+\subsection{Module and Module Dependency}
+
+A modular application may contain more than one module which is consisted of one or more classes. 
+%Dependencies in modular applications can be treated as dependencies of its different modules.
+A module can be defined as $M=<C, R, L>$. $C=\{c_1, c_2, c_3\cdots\}$  is the set of classes in that module. $L$ is a module class loader to load all the classes in the class set $C$. $R=\{M_1, M_2, M_3\cdots\}$ is the set of its dependency against other modules. 
+\textcolor{red}{$$R=\{M_1=<C_1, R_1, L_1> \mid \exists c_1 \in C, c_2 \in C_1, c_1 \rightarrow c_2\}$$
+The "$\rightarrow$" means import, that is to say, class $c_1$ in class set of module $M$ may inherit, create or invoke class $c_2$ in class set of module $M_1$. 
+So if $R=\emptyset$, $M$ doesn't depends any modules.
+Otherwise, $M$ depends all of modules in $R$.
+}
+
+\textcolor{red}{$L$ is a module class loader of module $M$ and it is responsible for loading all the classes of $M$. 
+Because of the dependencies of $M$, $M$ may depends on other modules. 
+In this case, only class loader $L$ cannot load some classes which depend on the classes in the other modules. 
+So class loader $L$ will delegate the class loaders in the depended modules to load the classes. 
+Meanwhile, class loader $L$ may help other module class loader to load other classes which are in the different modules and depend on the classes in module $M$. 
+This is the dependencies of module class loaders. 
+According to the definition, the dependencies of modules are also the dependencies of their class loaders and we will use this property in our approach.}
+
+
+
 \subsection{Hot Deployment}
 
 \begin{figure}[!t]
@@ -142,27 +163,7 @@ Figure \ref{fig:jboss_class_loader}  shows an illustrative architecture of class
 %Fig.\ref{fig:jboss_class_loader} gives an overview of class loader architecture in JBoss that supports hot deployment. 
 
 
-\subsection{Define of Dependencies} 
-
-A modular application may contain more than one module which is consisted of one or more classes. 
-%Dependencies in modular applications can be treated as dependencies of its different modules.
-A module can be defined as $M=<C, R, L>$. $C=\{c_1, c_2, c_3\cdots\}$  is the set of classes in that module. $L$ is a module class loader to load all the classes in the class set $C$. $R=\{M_1, M_2, M_3\cdots\}$ is the set of its dependency against other modules. 
-\textcolor{red}{$$R=\{M_1=<C_1, R_1, L_1> \mid \exists c_1 \in C, c_2 \in C_1, c_1 \rightarrow c_2\}$$
-The "$\rightarrow$" means import, that is to say, class $c_1$ in class set of module $M$ may inherit, create or invoke class $c_2$ in class set of module $M_1$. 
-So if $R=\emptyset$, $M$ doesn't depends any modules.
-Otherwise, $M$ depends all of modules in $R$.
-}
-
-\textcolor{red}{$L$ is a module class loader of module $M$ and it is responsible for loading all the classes of $M$. 
-Because of the dependencies of $M$, $M$ may depends on other modules. 
-In this case, only class loader $L$ cannot load some classes which depend on the classes in the other modules. 
-So class loader $L$ will delegate the class loaders in the depended modules to load the classes. 
-Meanwhile, class loader $L$ may help other module class loader to load other classes which are in the different modules and depend on the classes in module $M$. 
-This is the dependencies of module class loaders. 
-According to the definition, the dependencies of modules are also the dependencies of their class loaders and we will use this property in our approach.}
-
-
-\subsection{Reasons of Failures}
+\subsection{Hot deployment failures caused by module dependency}
 
 The current application servers have hot deployment capabilities using class loader architecture with module class loader chain.
 If a single module as an application deploys and updates online, module class loader will also update with it and application will be running regularly.
@@ -216,9 +217,7 @@ The index of original class structure of Class \emph{ComputeBean} still points t
 That is why call failure occurs when executing the method that calls the method of Class \emph{ValidatorBean}.
 
 
-
-
-\section{Approach\label{sec:approach}}
+\section{Dependency Reconstruction in Application Servers}
 
 According to the reasons of failures, reconstructing the lost dependencies is the key to support hot deployment of modular applications.
 The core idea of dependency reconstruction is to ensure consistency of modules and their dependencies.
@@ -261,7 +260,9 @@ This causes application servers inefficient and also causes hot deployment infle
 %// the deployment process, how to obtain dependencies
 %// disadvantages
  
-\subsection{Reconstruction in Class Loaders}
+ 
+\section{Dependency Reconstruction with class loaders}
+
 Application servers can manage dependencies of modules via the reverse dependency table.
 when hot deployment occurs, the reverse dependency table helps application servers to search the dependent modules whose dependencies are lost.
 However, these modules are still original versions and they don't make any changes.
@@ -303,7 +304,7 @@ They are Circle Dependency Reconstruction Class Loader(CDR Class Loader) with st
 Our customized class loaders not also complete basic class loading, but also maintain and reconstruct dependencies.
 Thus, hot deployment and dependency reconstruction becomes more flexible and efficient.
 
-\subsubsection{CDR Class Loader}
+\subsection{CDR Class Loader}
 
 \begin{algorithm}[h]
 \caption{function loadClass of CDR Class Loader}
@@ -367,7 +368,7 @@ The dependencies are managed in the CDR Class Loaders based on the static profil
 
 
 
-\subsubsection{ADR Class Loader}
+\subsection{ADR Class Loader}
 
 \begin{figure}[!t]
 \centering
@@ -437,7 +438,7 @@ But avoiding editing dependencies in the profiles of modules is a time saving th
 
 
 
-\subsubsection{ADRD Class Loader}
+\subsection{ADRD Class Loader}
 
 \begin{algorithm}[h]
 \caption{function loadClass of ADRD Class Loader}

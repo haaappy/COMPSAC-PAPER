@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2015.1.4)  10 JAN 2015 17:16
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2015.1.4)  11 JAN 2015 15:55
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -504,26 +504,27 @@ File: omsptm.fd
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 59.
 
-
-pdfTeX warning: /usr/texbin/pdflatex (file ./JBossClassLoader.pdf): PDF inclusi
-on: found PDF version <1.6>, but at most version <1.5> allowed
-<JBossClassLoader.pdf, id=93, 326.43446pt x 271.1169pt>
-File: JBossClassLoader.pdf Graphic file (type pdf)
-
-<use JBossClassLoader.pdf>
-Package pdftex.def Info: JBossClassLoader.pdf used on input line 122.
-(pdftex.def)             Requested size: 216.81pt x 180.07535pt.
- [1{/usr/local/texlive/2014basic/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
+[1{/usr/local/texlive/2014basic/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
 
 ]
+
+pdfTeX warning: /usr/texbin/pdflatex (file ./JBossClassLoader.pdf): PDF inclusi
+on: found PDF version <1.6>, but at most version <1.5> allowed
+<JBossClassLoader.pdf, id=107, 326.43446pt x 271.1169pt>
+File: JBossClassLoader.pdf Graphic file (type pdf)
+
+<use JBossClassLoader.pdf>
+Package pdftex.def Info: JBossClassLoader.pdf used on input line 143.
+(pdftex.def)             Requested size: 216.81pt x 180.07535pt.
+
 
 pdfTeX warning: /usr/texbin/pdflatex (file ./ExampleEJB.pdf): PDF inclusion: fo
 und PDF version <1.6>, but at most version <1.5> allowed
 <ExampleEJB.pdf, id=115, 395.12617pt x 289.35303pt>
 File: ExampleEJB.pdf Graphic file (type pdf)
  <use ExampleEJB.pdf>
-Package pdftex.def Info: ExampleEJB.pdf used on input line 184.
+Package pdftex.def Info: ExampleEJB.pdf used on input line 185.
 (pdftex.def)             Requested size: 252.94499pt x 185.22945pt.
 
 
@@ -533,7 +534,7 @@ n: found PDF version <1.6>, but at most version <1.5> allowed
 File: ejb_source_code.pdf Graphic file (type pdf)
 
 <use ejb_source_code.pdf>
-Package pdftex.def Info: ejb_source_code.pdf used on input line 191.
+Package pdftex.def Info: ejb_source_code.pdf used on input line 192.
 (pdftex.def)             Requested size: 252.94499pt x 201.91531pt.
  [2 <./JBossClassLoader.pdf>]
 Missing character: There is no â in font ptmr7t!
@@ -544,7 +545,7 @@ Missing character: There is no € in font ptmr7t!
 Missing character: There is no ™ in font ptmr7t!
  [3 <./ExampleEJB.pdf> <./ejb_source_code.pdf>]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 309.
+put line 310.
  [4]
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
@@ -553,48 +554,62 @@ Missing character: There is no ™ in font ptmr7t!
 
 pdfTeX warning: /usr/texbin/pdflatex (file ./DeploymentProcess.pdf): PDF inclus
 ion: found PDF version <1.6>, but at most version <1.5> allowed
-<DeploymentProcess.pdf, id=227, 230.38893pt x 384.79158pt>
+<DeploymentProcess.pdf, id=226, 230.38893pt x 384.79158pt>
 File: DeploymentProcess.pdf Graphic file (type pdf)
 
 <use DeploymentProcess.pdf>
-Package pdftex.def Info: DeploymentProcess.pdf used on input line 374.
+Package pdftex.def Info: DeploymentProcess.pdf used on input line 375.
 (pdftex.def)             Requested size: 158.99377pt x 265.55931pt.
 
 
 pdfTeX warning: /usr/texbin/pdflatex (file ./LoadingQueueA.pdf): PDF inclusion:
  found PDF version <1.6>, but at most version <1.5> allowed
-<LoadingQueueA.pdf, id=228, 229.17268pt x 145.28479pt>
+<LoadingQueueA.pdf, id=227, 229.17268pt x 145.28479pt>
 File: LoadingQueueA.pdf Graphic file (type pdf)
  <use LoadingQueueA.pdf>
-Package pdftex.def Info: LoadingQueueA.pdf used on input line 385.
+Package pdftex.def Info: LoadingQueueA.pdf used on input line 386.
 (pdftex.def)             Requested size: 159.59799pt x 101.17755pt.
 
 
 pdfTeX warning: /usr/texbin/pdflatex (file ./LoadingQueueB.pdf): PDF inclusion:
  found PDF version <1.6>, but at most version <1.5> allowed
-<LoadingQueueB.pdf, id=229, 229.78065pt x 150.75621pt>
+<LoadingQueueB.pdf, id=228, 229.78065pt x 150.75621pt>
 File: LoadingQueueB.pdf Graphic file (type pdf)
  <use LoadingQueueB.pdf>
-Package pdftex.def Info: LoadingQueueB.pdf used on input line 391.
+Package pdftex.def Info: LoadingQueueB.pdf used on input line 392.
 (pdftex.def)             Requested size: 154.21869pt x 101.17755pt.
 
 
 pdfTeX warning: /usr/texbin/pdflatex (file ./LoadingQueueC.pdf): PDF inclusion:
  found PDF version <1.6>, but at most version <1.5> allowed
-<LoadingQueueC.pdf, id=230, 282.05927pt x 151.3635pt>
+<LoadingQueueC.pdf, id=229, 282.05927pt x 151.3635pt>
 File: LoadingQueueC.pdf Graphic file (type pdf)
  <use LoadingQueueC.pdf>
-Package pdftex.def Info: LoadingQueueC.pdf used on input line 397.
+Package pdftex.def Info: LoadingQueueC.pdf used on input line 398.
 (pdftex.def)             Requested size: 188.54402pt x 101.17755pt.
 
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
 [5 <./DeploymentProcess.pdf>]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \hbox (badness 10000) in paragraph at lines 528--537
+[]\OT1/ptm/m/n/10 Adaptive De-pen-dency Re-con-struc-tion De-lay Class
+ []
 
 
-Underfull \hbox (badness 1675) in paragraph at lines 566--567
+Underfull \hbox (badness 3302) in paragraph at lines 528--537
+\OT1/ptm/m/n/10 with ADR Class Loader, ADRD Class Loader de-lays
+ []
+
+
+Underfull \hbox (badness 2865) in paragraph at lines 528--537
+\OT1/ptm/m/n/10 of ADR Class Loader. Their main dif-fer-ence is their
+ []
+
+
+Underfull \hbox (badness 7344) in paragraph at lines 528--537
+\OT1/ptm/m/n/10 re-con-struc-tion time. ADRD Class Loader re-con-structs
+ []
+
+
+Underfull \hbox (badness 1675) in paragraph at lines 567--568
 []\OT1/ptm/m/n/10 AS: JBoss AS 5.1.0 & JBoss AS 5.1.0 ex-ten-
  []
 
@@ -610,25 +625,25 @@ pdfTeX warning: /usr/texbin/pdflatex (file ./LoadingQueueC.pdf): PDF inclusion:
 
 pdfTeX warning: /usr/texbin/pdflatex (file ./xmlpicture.pdf): PDF inclusion: fo
 und PDF version <1.6>, but at most version <1.5> allowed
-<xmlpicture.pdf, id=384, 325.215pt x 157.81158pt>
+<xmlpicture.pdf, id=382, 325.215pt x 157.81158pt>
 File: xmlpicture.pdf Graphic file (type pdf)
  <use xmlpicture.pdf>
-Package pdftex.def Info: xmlpicture.pdf used on input line 671.
+Package pdftex.def Info: xmlpicture.pdf used on input line 672.
 (pdftex.def)             Requested size: 252.94499pt x 122.74577pt.
  [7 <./xmlpicture.pdf>] [8]
-Underfull \hbox (badness 10000) in paragraph at lines 758--759
+Underfull \hbox (badness 10000) in paragraph at lines 759--760
 []\OT1/ptm/m/n/8 Oracle We-bLogic Server, []$http : / / www . oracle . com / te
 chnetwork /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 782--783
+Underfull \hbox (badness 10000) in paragraph at lines 783--784
 []\OT1/ptm/m/n/8 Java Vir-tual Ma-chine, []$http : / / java-[]virtual-[]machine
  . net /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 803--804
+Underfull \hbox (badness 10000) in paragraph at lines 804--805
 []\OT1/ptm/m/n/8 Java Pet Store, []$http : / / www . oracle . com / technetwork
  / java /
  []
@@ -640,7 +655,7 @@ Missing character: There is no   in font ptmr7t!
 Missing character: There is no Â in font ptmr7t!
 Missing character: There is no   in font ptmr7t!
 
-Underfull \hbox (badness 1910) in paragraph at lines 829--830
+Underfull \hbox (badness 1910) in paragraph at lines 830--831
 []\OT1/ptm/m/n/8 Dornemann, Kay, and Bernd Freisleben. "Dis-cov-er-ing Grid Re-
 
  []
@@ -676,7 +691,7 @@ Missing character: There is no ± in font ptmr7t!
 Missing character: There is no Â in font ptmr7t!
 Missing character: There is no   in font ptmr7t!
 
-Underfull \hbox (badness 6157) in paragraph at lines 859--860
+Underfull \hbox (badness 6157) in paragraph at lines 860--861
 \OT1/ptm/m/n/8 "Op-ti-miz-ing OSGi Ser-vices on Gate-ways."Ambient Intelligence
 -
  []
@@ -694,43 +709,59 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 868.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 869.
 - LAST -
-Extra skip:37.01709pt
-Left:520.91309pt/1.12793pt
-Right:483.896pt/1.12793pt
-Output:520.91309pt
+Extra skip:51.76707pt
+Left:565.16307pt/1.73193pt
+Right:513.396pt/1.12793pt
+Output:565.16307pt
 [9]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 868.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 869.
  (./compsac.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 868.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 868.
-Package rerunfilecheck Info: File `compsac.out' has not changed.
-(rerunfilecheck)             Checksum: D3B052DE7396F2D1866156BA88292780;1229.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 869.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 869.
+
+
+Package rerunfilecheck Warning: File `compsac.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `compsac.out':
+(rerunfilecheck)             Before: 0DB3030445D53A631257BBAB79E5258E;1267
+(rerunfilecheck)             After:  B76298A16AA78DD5CCB2DDBFBF7C1135;1291.
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
  ) 
 Here is how much of TeX's memory you used:
- 9010 strings out of 494522
- 136920 string characters out of 6167206
- 263705 words of memory out of 5000000
- 12048 multiletter control sequences out of 15000+600000
+ 9011 strings out of 494522
+ 136910 string characters out of 6167206
+ 265230 words of memory out of 5000000
+ 12047 multiletter control sequences out of 15000+600000
  40640 words of font info for 77 fonts, out of 8000000 for 9000
  322 hyphenation exceptions out of 8191
  44i,10n,47p,1066b,882s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2014basic/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/lo
-cal/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
-r/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb>
-</usr/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.p
-fb></usr/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7
-.pfb></usr/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cm
-sy10.pfb></usr/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/c
-m/cmti10.pfb></usr/local/texlive/2014basic/texmf-dist/fonts/type1/urw/times/utm
-b8a.pfb></usr/local/texlive/2014basic/texmf-dist/fonts/type1/urw/times/utmbi8a.
-pfb></usr/local/texlive/2014basic/texmf-dist/fonts/type1/urw/times/utmr8a.pfb><
-/usr/local/texlive/2014basic/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on compsac.pdf (9 pages, 1000672 bytes).
+pdfTeX warning (dest): name{subsection.3.3} has been referenced but does not 
+exist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsection.3.2} has been referenced but does not ex
+ist, replaced by a fixed one
+
+{/usr/local/texlive/2014basic/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/loca
+l/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/
+local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></
+usr/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb
+></usr/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.p
+fb></usr/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy
+10.pfb></usr/local/texlive/2014basic/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmti10.pfb></usr/local/texlive/2014basic/texmf-dist/fonts/type1/urw/times/utmb8
+a.pfb></usr/local/texlive/2014basic/texmf-dist/fonts/type1/urw/times/utmbi8a.pf
+b></usr/local/texlive/2014basic/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></u
+sr/local/texlive/2014basic/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on compsac.pdf (9 pages, 999853 bytes).
 PDF statistics:
- 535 PDF objects out of 1000 (max. 8388607)
- 462 compressed objects within 5 object streams
- 116 named destinations out of 1000 (max. 500000)
+ 537 PDF objects out of 1000 (max. 8388607)
+ 464 compressed objects within 5 object streams
+ 118 named destinations out of 1000 (max. 500000)
  201 words of extra memory for PDF output out of 10000 (max. 10000000)
 
