@@ -48,10 +48,10 @@
 
 \title{Hot Deployment with Dependency Reconstruction}
 
-\author{\IEEEauthorblockN{Haicheng Li, Chun Cao, Xiaoxing Ma, Jian Lu}
+\author{\IEEEauthorblockN{Haicheng Li, Chun Cao,  Ping Yu}
 \IEEEauthorblockA{State Key Lab for Novel Software Technology, Nanjing University, Nanjing, China\\
 Dept. of Computer Science and Technology, Nanjing University, Nanjing, China\\
-lhc\_happy@sina.cn, caochun@gmail.com, \{xxm, lj\}@nju.edu.cn}
+lhc\_happy@sina.cn, \{caochun, yuping\}@nju.edu.cn}
 }
 
 % make the title area
@@ -70,7 +70,7 @@ Experiments show that our technology of hot deployment can ensure the correctnes
 \end{abstract}
 
 \begin{IEEEkeywords}
-Modular applications; Hot deployment; Dependency Reconstruction; Class Loading.
+Hot deployment; Dependency reconstruction; Class loading.
 \end{IEEEkeywords}
 
 
@@ -89,7 +89,9 @@ Applications in multiple packages, which are called as \emph{modular application
 To solve the problem, the dependencies need to be reconstructed. Intuitively, this can be done manually. The developer should have the knowledge of dependent configuration among the application modules and be aware the affection scope of the redeployment. Then they can redeploy the dependent ones by hand. However, this requires human intervention can be strenuous and even error-prone, especially for large-scale application. Alternatively, they can also redeploy all the modules for that application. But it is not only unnecessary but also cause the state of unaffected part to be destructed, such as data storage module which is hardly updated. 
 
 
-In this paper, we introduce a general approach to enable the correct hot deployment respecting the dependencies among modulars. The dependencies are constructed with  class loaders for the modulars and upon the dependent modulars can be calculated and  their hot deployment can be triggered. ...
+In this paper, we introduce a general approach to enable the correct hot deployment respecting the dependencies among modulars. The dependencies are constructed with  class loaders for the modulars and upon the dependent modulars can be calculated and  their hot deployment can be triggered. In order to update flexibly and efficiently, we put dependency management and maintenance in module class loaders. Dependency reconstruction will be done in the class loaders, so that dependent modules only update their class loaders and they don't need to do anything else except class loading in the process of redeployment.
+
+
 
 % Application servers can also carry out the redeploy process automatically as . In this way, dependencies are reconstructed and dependent modules will be handled through plenty of steps from the deployment process. Actually, depended modules are the updated modules and updating dependent modules is just for reconstruct dependencies.
 %This causes application servers inefficient and also causes hot deployment inflexibility.
@@ -104,102 +106,66 @@ In this paper, we introduce a general approach to enable the correct hot deploym
 
 
 %In this paper, we analyze reasons of failures and a technology of hot deployment with dependency reconstruction is introduced.
-In order to update flexibly and efficiently, we put dependency management and maintenance in module class loaders.
-Dependency reconstruction will be done in the class loaders, so that dependent modules only update their class loaders and they don't need to do anything else except class loading in the process of redeployment.
-
 The rest of this paper is organized as follow. 
-Section \ref{sec:background} defines the dependencies of modular applications and analyzes reasons of failures based on hot deployment mechanism. 
-Section \ref{sec:approach} discuss disadvantages of dependency reconstruction in application servers and describes our approach of dependency reconstruction in module class loaders.
+Section \ref{sec:background} reviews the hot deployment mechanism and analyzes reasons of failures based on hot deployment mechanism. 
+Section \ref{sec:reconstructionAS} describes dependency reconstruction in application servers, which is a common approach to solve dependency lost.
+And Section \ref{sec:reconstructionCL} presents a more effective approach of dependency reconstruction in class loaders.
 We give the evaluations in Section \ref{sec:evaluation} and Section \ref{sec:relatedwork} is the related work.
 Lastly in Section \ref{sec:conclusion}, we conclude this paper and discuss future work.
 
 \section{Background\label{sec:background}}
-In this section, hot deployment mechanism is described. 
-We talk about how application servers hot deploy modules with its internal class loading mechanism. 
-To explain dependencies in modular applications, we define dependencies of modules and we use the definition in our approach. 
-Moreover, we give reasons why dependencies may be lost and failures may happen when running modular applications in a mainstream application server.
+In this section, the hot deployment mechanism of current application servers are reviewed. We also analyze the cause of the failure in hot deploying the modular applications.
 
-\subsection{Hot Deployment}
+\subsection{Module and Module Dependency}
 
-\begin{figure}[!t]
-\centering
-\includegraphics[width=3.0in]{JBossClassLoader.pdf}
-\caption{class loader architecture in JBoss}
-\label{fig:jboss_class_loader}
-\end{figure}
-
-In the J2EE\cite{j2ee} field, mainstream application servers, such as JBoss, have abilities to hot deploy and hot undeploy.
-When applications running in an application server need to be updated, hot deployment technology makes server not restart to guarantee the operation of other applications. 
-In order to pursue dynamics of programs and hot deployment, standard class loader\cite{standard_cl} architecture must be destroyed.
-That is because it has a main (share) class loader to load all of the application classes. 
-Updating online some applications leads to the update of the main class loader, so that other applications will be affected. 
-
-The new architecture using module class loader chain can support hot deployment of standalone applications. 
-In this chain, each module has its own class loader instances and cache. Under this mechanism, each module class loader is independent. 
-When hot deploying, the corresponding module class loader in the chain will be removed and a new version of the module class loader will be created.
-In this way, application servers ensure consistency of the application versions and complete hot deployment of applications\cite{module_cl}.
-
-This class loading mechanism is used in many mainstream application servers. 
-Fig.\ref{fig:jboss_class_loader} gives an overview of class loader architecture in JBoss that supports hot deployment. 
-\emph{Sytem ClassLoaders} and \emph{ServerLoader} are loading JBoss server and its library. 
-\emph{Web ENCLoader} and \emph{War Loader} are responsible for loading web applications and \emph{EJB DynClassLoader} and \emph{EJB ENCLoader} are responsible for loading EJB applications. 
-The most important class loader is \emph{UnifiedClassLoader}, which covers EARs, JARs, WARs, SARs and directories seen by the deployment scanner as well as JARs referenced by their manifests and any nested deployment units they may contain\cite{jboss_class_loader}. 
-Because each \emph{UnifiedClassLoader} is responsible for only one module, it is just a module class loader which helps JBoss achieve hot deployment.
-
-
-\subsection{Define of Dependencies} 
-
-A modular application may contain plenty of modules and a module may contain plenty of classes.
-Dependencies in modular applications can be treated as dependencies of its different modules.
-The module is defined as $M=<C, R, L>$, which means a set of classes $C=\{c_1, c_2, c_3\cdots\}$ and a set of related modules $R=\{M_1, M_2, M_3\cdots\}$.
+A modular application may contain more than one module which is consisted of one or more classes. 
+A module can be defined as $M=<C, R, L>$. $C=\{c_1, c_2, c_3\cdots\}$ is the set of classes in that module. 
 $L$ is a module class loader to load all the classes in the class set $C$.
-We use it to describe dependencies of modules.
-And dependency $R$ of module $M$ can be created in the following way.
-$$R=\{M_1=<C_1, R_1, L_1> \mid \exists c_1 \in C, c_2 \in C_1, c_1 \rightarrow c_2\}$$
-The "$\rightarrow$" means import, that is to say, class $c_1$ in class set of module $M$ may inherit, create or invoke class $c_2$ in class set of module $M_1$. 
-So if $R=\emptyset$, $M$ doesn't depends any modules.
-Otherwise, $M$ depends all of modules in $R$.
+$R=\{M_1, M_2, M_3\cdots\}$ is the set of its dependency against other modules. 
 
-$L$ is a module class loader of module $M$ and it is responsible for loading all the classes of $M$. 
-Because of the dependencies of $M$, $M$ may depends on other modules. 
-In this case, only class loader $L$ cannot load some classes which depend on the classes in the other modules. 
-So class loader $L$ will delegate the class loaders in the depended modules to load the classes. 
-Meanwhile, class loader $L$ may help other module class loader to load other classes which are in the different modules and depend on the classes in module $M$. 
-This is the dependencies of module class loaders. 
-According to the definition, the dependencies of modules are also the dependencies of their class loaders and we will use this property in our approach.
-
-
-\subsection{Reasons of Failures}
-
-The current application servers have hot deployment capabilities using class loader architecture with module class loader chain.
-If a single module as an application deploys and updates online, module class loader will also update with it and application will be running regularly.
-However, when there are dependencies between the modular applications which need update depended modules, call failure will occur.
-Module class loaders in the class loader chain will load classes from each module separately.
-When only a depended module updating online, its original module class loader will be replaced by a new module class loader.
-But the module class loader of dependent module still exists, and the module it depends is still an old version which has been removed.
-In this case, dependency loss occurs and calling the depended module again will result in call failure.
-
-Fig.\ref{fig:example} is an example of an easy modular application with dependency injection\cite{DI}, which has two EJB\cite{EJB} components deployed in the application server.
-The dependent module Compute.jar is a session bean for computing division.
-The depended module Validator.jar is another session bean to verify the divisor is zero or not. 
-From the source code of the EJB application in Fig.\ref{fig:ejb_source_code}, the dependency reflects in the divisor must be check whether it is zero when calculating the division of two numbers. 
-When two modules are deployed, the classes in the modules are loaded by module class loaders. 
-Hot deployment required that every module must have its own class loader instance, so that Class Loader $C$ loads Class \emph{ComputeBean} in Compute.jar while Class Loader $V$ loads Class \emph{ValidatorBean} in Validator.jar.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=3.5in]{ExampleEJB.pdf}
-\caption{details of loading classes}
+\caption{a modular application and loading details}
 \label{fig:example}
 \end{figure}
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=3.5in]{ejb_source_code.pdf}
-\caption{the main source code of two session beans}
+\caption{main source codes of two session beans}
 \label{fig:ejb_source_code}
 \end{figure}
 
+
+Fig.\ref{fig:example} is an easy modular application with dependency injection\cite{DI}, which has two EJB\cite{EJB} components deployed in the application server.
+The dependent module Compute.jar is a session bean for computing division.
+The depended module Validator.jar is another session bean to verify the divisor is zero or not. 
+From the source code of the EJB application in Fig.\ref{fig:ejb_source_code}, the dependency reflects in the divisor must be check whether it is zero when calculating the division of two numbers. 
+In module Compute.jar, $R = \{Validator.jar\}$, because class \emph{ComputeBean} calls the method in class \emph{ValidatorBean} and these two classes are in different modules. 
+In module Validator.jar, $R = \emptyset$, which means Validator.jar doesn’t depends on any modules. 
+
+
+\subsection{Hot Deployment}
+
+Hot deployment built in mainstream application servers enables applications on the servers to be are published, updated or withdrawn without restarting the servers. This feature is based on the class loading mechanism beyond the standard class loaders\cite{standard_cl} in Java system. Conceptually, each module, as an standard alone application, to be deployed has its own class loader instead of sharing one with other modules so that standalone applications in that module can be independently operated. All the effective module class loaders are organized together (in a chain or pool) so that they can find each other and delegate each other to load classes and resources which enables the mutual referring and sharing among the modules. When some module are hot deployed, the corresponding module class loader will be removed and a new one will be created to load the new version of the module. In this way, application servers complete hot deployment of applications\cite{module_cl}.
+
+Figure \ref{fig:jboss_class_loader} shows an illustrative architecture of class loading in JBoss and other application servers adopt similar designs. As for JBoss, \emph{Sytem ClassLoaders} and \emph{ServerLoader} are responsible to load JBoss server itself. The most important class loader is \emph{UnifiedClassLoader}, which covers EARs, JARs, WARs, SARs and directories seen by the deployment scanner as well as JARs referenced by their manifests and any nested deployment units they may contain\cite{jboss_class_loader}. For example, if the division EJB application shown in Fig.\ref{fig:example} is deployed in JBoss, \emph{EJB DynClassLoader} and \emph{EJB ENCLoader} are responsible for loading the classes in this EJB applications. Finally, \emph{UnifiedClassLoader} is delegated to load classes and each \emph{UnifiedClassLoader} instance is placed in \emph{UnifiedLoaderRepository} after finishing class loading. Because each \emph{UnifiedClassLoader} instance is responsible for only one module, it is just a module class loader which helps JBoss achieve hot deployment.
+
+
+\subsection{Hot Deployment Failures Caused by Module Dependency}
+
+The current application servers have hot deployment capabilities using class loader architecture with module class loaders.
+If a single module as an application deploys and updates online, module class loader will also update with it and application will be running regularly.
+However, when there are dependencies between the modular applications which need update depended modules, call failure will occur.
+Module class loaders will load classes from each module separately.
+When only a depended module updating online, its original module class loader will be replaced by a new module class loader.
+But the module class loader of dependent module still exists, and the module it depends is still an old version which has been removed.
+In this case, dependency loss occurs and calling the depended module again will result in call failure.
+
+For the division application in Fig.\ref{fig:example}, when two modules are deployed, the classes in the modules are loaded by module class loaders. 
+Hot deployment required that every module must have its own class loader instance, so that Class Loader $C$ loads Class \emph{ComputeBean} in Compute.jar while Class Loader $V$ loads Class \emph{ValidatorBean} in Validator.jar.
 After class loading, the information of Class \emph{ComputeBean} and Class \emph{ValidatorBean} is resolved and is stored in their own class structure in the Java virtual machine (JVM). 
 JVM is the cornerstone of the Java platforms. It is the component of the technology responsible for its hardware and operating system independence, the small size of its compiled code, and its ability to protect users from malicious programs\cite{jvm}. 
 Here we focus on several class information stored in the class structure. 
@@ -222,18 +188,20 @@ At this moment, the dependency that JVM creates at the first deployment is lost.
 The index of original class structure of Class \emph{ComputeBean} still points to the original class structure of Class \emph{ValidatorBean} which is old version and will be removed after redeployment of Validator.jar with the new version of Class \emph{ValidatorBean}. 
 That is why call failure occurs when executing the method that calls the method of Class \emph{ValidatorBean}.
 
+\begin{figure}[!t]
+\centering
+\includegraphics[width=3.0in]{JBossClassLoader.pdf}
+\caption{class loader architecture in JBoss}
+\label{fig:jboss_class_loader}
+\end{figure}
 
-
-
-\section{Approach\label{sec:approach}}
+\section{Dependency Reconstruction in Application Servers\label{sec:reconstructionAS}}
 
 According to the reasons of failures, reconstructing the lost dependencies is the key to support hot deployment of modular applications.
 The core idea of dependency reconstruction is to ensure consistency of modules and their dependencies.
 The consistency is not only for the updating modules, but also for the original modules if they depend on the updating modules.
 To find out the dependent modules when hot deployment happens, we need to manage and maintain all the dependencies when modular applications are deployed at the first time.
 This section gives our approach to dependency reconstruction.
-
-\subsection{Reconstruction in Application Servers}
 
 In the process of application development, it is very common that modular applications split into separate components and they are deployed in the application server at the same time. 
 Fig.\ref{fig:example} is such an example of an easy modular application which can be deployed in JBoss. 
@@ -248,6 +216,14 @@ Through the dependency injector, the deployment unit context of Compute.jar can 
 Because of dependencies, the depended module must be deployed and loaded before the dependent module. 
 Finally, all of them finish deployment.
 
+\begin{figure}[!t]
+\centering
+\includegraphics[width=2.2in]{ProcessReconstructionAS.pdf}
+\caption{dependency reconstruction in appliaction servers}
+\label{fig:reconstruction_AS}
+\end{figure}
+
+Fig.\ref{fig:reconstruction_AS} is a logical block diagram of hot deployment with dependency reconstruction in application servers.
 In order to reconstruct dependencies, if depended modules are redeployed the dependent modules must be redeployed too. 
 This is our core idea of solving the problem. 
 We modify some source codes of JBossAS 5.1.0 to improve its hot deployment capabilities and extend the deployment process by two steps. 
@@ -268,7 +244,9 @@ This causes application servers inefficient and also causes hot deployment infle
 %// the deployment process, how to obtain dependencies
 %// disadvantages
  
-\subsection{Reconstruction in Class Loaders}
+ 
+\section{Dependency Reconstruction in Class Loaders\label{sec:reconstructionCL}}
+
 Application servers can manage dependencies of modules via the reverse dependency table.
 when hot deployment occurs, the reverse dependency table helps application servers to search the dependent modules whose dependencies are lost.
 However, these modules are still original versions and they don't make any changes.
@@ -294,23 +272,20 @@ Generally, there should be a parent class loader called system class loader in e
 This parent class loader can be treated as a depended class loader because the original class really depends on the system class which loaded by its parent class loader.
 Based on parent delegation and our dependency graph for module class loaders, our class loader architecture model is organized in both a class loader hierarchy and a class loader network\cite{class_loader_patent}.
 
-If updating is detected, some affected class loaders and dependencies must be modified.
-However, modifying the changing class loaders and their dependencies is not enough because dependencies may be lost while hot deploying depended modules.
-For instance, if Validator.jar is updated, in order to reconstruct dependencies, all of modules which depend on Validator.jar also require to be updated even though they have no new versions and users don't want to update them.
-So we reconstruct the dependencies for Validator.jar by updating these class loader of affected modules.
-But reconstruction is not finished because these dependent modules may be depended on other modules.
-We need to reconstruct their dependencies too in the same way, until there is no updated modules are depend on any of the updated modules.
-All the affected modules should own their new class loader instance instead of the old one, because the old class loader has the cache of old classes and it cannot load the new classes with the same name.
-Replacing the old class loaders is the most convenient way to update modules and reconstruct dependencies.
-Meanwhile, updating the old class loader instances and dependencies is necessary. 
-
-As we know, class loader is an important concept in Java projects and application servers based on J2EE.
+As we know, class loader is an important concept in Java projects and application servers based on J2EE\cite{j2ee}.
 We implement to three safe and reliable module class loaders to support hot deployment of dependency reconstruction.
 They are Circle Dependency Reconstruction Class Loader(CDR Class Loader) with static dependency management, Adaptive Dependency Reconstruction Class Loader(ADR Class Loader) and Adaptive Dependency Reconstruction Delay Class Loader(ADRD Class Loader) with dynamic dependency management.
 Our customized class loaders not also complete basic class loading, but also maintain and reconstruct dependencies.
 Thus, hot deployment and dependency reconstruction becomes more flexible and efficient.
 
-\subsubsection{CDR Class Loader}
+\subsection{Class Loader with Static Management}
+
+Static dependency management is based on profiles of modules. 
+The profile describes the module information including dependencies and main classes. 
+It is named after the module in order to manage the module with a unified identification. 
+For example, a profile named \emph{Compute.xml} in the module Compute.jar records the dependencies of Compute.jar. 
+So dependency graph is created by profiles of all the modules. 
+The dependent class loaders will be set in the CDR Class Loader of each module.
 
 \begin{algorithm}[h]
 \caption{function loadClass of CDR Class Loader}
@@ -353,35 +328,31 @@ The loaded class instance: $c$
 \end{algorithmic}
 \end{algorithm}
 
-Static dependency management is based on profiles of deployment nodes. 
-The profile need to describe dependencies of the deployment node. 
-So dependency graph is created by CDR Class Loader according all of profiles in the deployment nodes. 
-Profiles in deployment nodes are used to describe the module information including dependencies and main classes. 
-To manage the deployment node with a unified identification, the profile is named after the deployment node where it is placed. 
-For example, a profile named Compute.xml in the deployment node Compute.jar makes module and its class loader get the dependencies of Compute.jar.
 Algorithm \ref{alg:CDR_Class_Loader} shows CDR Class Loader how to load classes. 
 The class loader will try the dependent class loaders to load classes at first. 
-The system class loader will load the system classes because it is the dependent class loader of every module class loader. 
+We regard the system class loader as a dependent class loader of every module class loader to guarantee the safe loading of system classes. 
 The dependency graph probably has a circle so that there must be circle detection in the algorithm of loading classes. 
 According the definition of module dependency, class set $C$, class loader $L$ and dependencies $R$ of each module $M$ are determined from the dependency graph. 
 Moreover, we can obtain the dependent class loader list of $L$ from each class loader of each module in $R$, which represents \emph{depArrayList} in Algorithm \ref{alg:CDR_Class_Loader}. 
 
-Reconstruction process is similar to the process of creating dependency graph. 
-The graph and CDR Class Loaders are updated by the new version of deployment nodes profiles before the loading of classes. 
-Then all of modules which depend on updating modules also require to be updated even though they have no new versions and users don’t want to update them. 
+If updating is detected, some affected class loaders and dependencies must be modified.
+However, modifying the changing class loaders and their dependencies is not enough because dependencies may be lost while hot deploying depended modules.
+For instance, if Validator.jar is updated, in order to reconstruct dependencies, all of modules which depend on Validator.jar also require to be updated even though they have no new versions and users don't want to update them.
+So we reconstruct the dependencies for Validator.jar by updating these class loader of affected modules.
+But reconstruction is not finished because these dependent modules may be depended on other modules.
+We need to reconstruct their dependencies too in the same way, until there is no updated modules are depend on any of the updated modules.
+All the affected modules should own their new class loader instance instead of the old one, because the old class loader has the cache of old classes and it cannot load the new classes with the same name.
+Replacing the old class loaders is the most convenient way to update modules and reconstruct dependencies.
+Meanwhile, updating the old class loader instances and dependencies is necessary.
+
+In CDR Class Loader, reconstruction process is similar to the process of creating dependency graph. 
+The graph and CDR Class Loaders are updated by the new version of profiles before the loading of classes. 
+Then all of modules which depend on updating modules also require to be updated even though they have no new versions. 
 And their dependencies need to be reconstructed too in the same way, until there is no updated modules are depend on any of the updated modules. 
 The dependencies are managed in the CDR Class Loaders based on the static profiles of modules.
 
 
-
-\subsubsection{ADR Class Loader}
-
-\begin{figure}[!t]
-\centering
-\includegraphics[width=2.2in]{DeploymentProcess.pdf}
-\caption{hot deployment process}
-\label{fig:deployment_process}
-\end{figure}
+\subsection{Class Loader with Dynamic Management}
 
 \begin{figure*}[!t]
 \centering
@@ -406,16 +377,23 @@ The dependencies are managed in the CDR Class Loaders based on the static profil
 \label{fig:loading_queue}
 \end{figure*}
 
-Editing profiles of deployment nodes is a quite messy work when modular applications constitute hundreds of modules.
+\begin{figure}[!t]
+\centering
+\includegraphics[width=2.2in]{ProcessReconstructionCL.pdf}
+\caption{dependency reconstruction in class loaders}
+\label{fig:reconstruction_CL}
+\end{figure}
+
+Editing profiles of deployment nodes is a quite messy work when modular applications are composed of hundreds of modules.
 Dynamic dependency management avoids this work because it has a loading queue to make a try when loading classes.
 The loaded class will be placed in the node repository and the unloaded class will enter the loading queue again to wait for the next loading.
 Due to continuous trying, we can obtain dependencies of all the classes(modules) by an adaptive way.
 The priority order of loading rules is described in the following:
-\begin{itemize}[\IEEEsetlabelwidth{z}]
-\item[a)] Try to use the system class loader to load it, if the class name begins with "java.".
-\item[b)] Try to use its own class loader to load it.
-\item[c)] Try to use its dependent class loaders to load it.
-\item[d)] Try to use the class loaders which have already loaded other classes in the repository. 
+\begin{itemize}[\IEEEsetlabelwidth{9}]
+\item[1)] Try to use the system class loader to load it, if the class name begins with "java.".
+\item[2)] Try to use its own class loader to load it.
+\item[3)] Try to use its dependent class loaders to load it.
+\item[4)] Try to use the class loaders which have already loaded other classes in the repository. 
 \end{itemize}
 
 Fig.\ref{fig:loading_queue} shows the loading classes process of the division EJB application that we used before. 
@@ -437,14 +415,10 @@ We can find out all the dependent modules group by group.
 No matter whether these modules have the new version, they must be removed in the repository as the old ones and then put them in the loading queue to be reloaded. 
 So, all the lost dependences will be reconstructed by taking the place of the original class loaders and their dependent class loaders. 
 
-Fig.\ref{fig:deployment_process} shows the whole process of hot deployment with dependency reconstruction in class loaders. 
+Fig.\ref{fig:reconstruction_CL} shows the whole process of hot deployment with dependency reconstruction in class loaders. 
 The affected modules only update their module class loaders and the affected classes need to be reloaded through the loading queue, so that we save the part cost of redeployment process for the dependent modules which are still the old versions. 
-Even though, adaptive way to load class is time consuming. 
-But avoiding editing dependencies in the profiles of modules is a time saving thing for developers of modular applications or administrators of class loading platform.
+Even though adaptive way to load class is time consuming, avoiding editing dependencies in the profiles of modules is a time saving thing for developers of modular applications or administrators of application servers.
 
-
-
-\subsubsection{ADRD Class Loader}
 
 \begin{algorithm}[h]
 \caption{function loadClass of ADRD Class Loader}
@@ -530,7 +504,6 @@ The loaded class instance: $c$
 \end{algorithmic}
 \end{algorithm}
 
-
 Adaptive Dependency Reconstruction Delay Class Loader(ADRD Class Loader) inherits Adaptive Dependency Reconstruction Class Loader(ADR Class Loader).
 Comparing with ADR Class Loader, ADRD Class Loader delays dependency reconstruction when hot deployment happens.
 All the affected class loaders only mark as invalid class loaders and none of class loaders are updated.
@@ -541,8 +514,7 @@ Similarly, dependency reconstruction process is also as the same as the reconstr
 Their main difference is their reconstruction time.
 ADRD Class Loader reconstructs dependencies when applications are executed, so that it may save the time of hot deployment and avoid reconstruction if users never execute some modules after updating them.
 
-
-\subsection{Contribution}
+%\subsection{Contribution}
 Our contribution is to propose a technology of hot deployment with dependency reconstruction.
 From an engineering point of view, hot deployment with dependency reconstruction solves the problem of hot deploying modular applications in practical engineering projects.
 Particularly, we customize the class loader which can manage dependencies of modules.
@@ -557,11 +529,10 @@ The hot deployment becomes more flexible.
 %// our contribution
 
 
-
 \section{Evaluation\label{sec:evaluation}}
-In this section, we did some evaluations on the correctness, efficiency, dynamic feature and flexibility for our technology of hot deployment with dependency reconstruction.
+In this section, we did some evaluations on efficiency, dynamic feature and flexibility for our technology of hot deployment with dependency reconstruction.
 
-\subsection{Correctness}
+\subsection{Experiment}
 Mainstream application servers only support hot deployment of standalone applications, which cannot satisfy the requirement of modular applications.
 Hot deployment with dependency reconstruction can ensure the correctness of the modular applications.
 We use a simple division modular application in Fig.\ref{fig:example} to evaluate the hot deployment with dependency reconstruction.
@@ -631,7 +602,7 @@ We use the original context and only update its module class loader before distr
 So we save the time used to create and set the deployment context in the redeployment process.
 
 Table \ref{tab:stage} shows the cost of redeployment in these two stages for some modules and applications.
-Compute.jar and Validator.jar are two session beans which constitute an example application of division in Fig. \ref{fig:division_example}.
+Compute.jar and Validator.jar are two session beans which constitute an example application of division in Fig. \ref{fig:example}.
 Java Pet Store\cite{java_pet_store} is a sample well-known application from the J2EE, so it is also one of our subjects.
 The rest testing modules are services of JBoss, which can be found in the examples directory of JBossAS 5.1.0 Release.
 We hot deploy them when the application server is running and calculate the time cost of the configuration stage and distribution stage.
@@ -767,8 +738,11 @@ Oracle WebLogic Server, \url{http://www.oracle.com/technetwork/middleware/weblog
 \bibitem{middleware_reliability}
 Huang, Gang, et al. "Simulation-based analysis of middleware service impact on system reliability: Experiment on Java application server." Journal of Systems and Software 84.7 (2011): 1160-1170.
 
-\bibitem{j2ee}
-Bodoff, Stephanie, ed. The J2EE tutorial. Addison-Wesley Professional, 2002.
+\bibitem{DI}
+Fowler, Martin. "Inversion of control containers and the dependency injection pattern." (2004).
+
+\bibitem{EJB}
+JSR 220: Enterprise JavaBeans\textsuperscript{\texttrademark} 3.0, \url{https://www.jcp.org/en/jsr/detail?id=220}.
 
 \bibitem{standard_cl}
 Taylor, B. "Java Class Loading: The Basics." (2003).
@@ -778,12 +752,6 @@ Gangadharan, Binod Pankajakshy, Srikanth Padakandla, and Sivakumar Melapannai Th
 
 \bibitem{jboss_class_loader}
 The JBoss JMX Microkernel, \url{http://docs.jboss.org/jbossas/jboss4guide/r5/html/ch2.chapter.html}.
-
-\bibitem{DI}
-Fowler, Martin. "Inversion of control containers and the dependency injection pattern." (2004).
-
-\bibitem{EJB}
-JSR 220: Enterprise JavaBeans\textsuperscript{\texttrademark} 3.0, \url{https://www.jcp.org/en/jsr/detail?id=220}.
 
 \bibitem{jvm}
 Java Virtual Machine, \url{http://java-virtual-machine.net/sun-java-virtual-machine.html}.
@@ -802,6 +770,9 @@ Rohit Chaudhri. "Understnding the Java Classloading Mechanism." Java Developer's
 
 \bibitem{class_loader_patent}
 Meduri, Subbarao K., Thomas Edward Musta, and James Lee Van Oosten. "Collaborative classloader system and method." U.S. Patent No. 7,870,546. 11 Jan. 2011.
+
+\bibitem{j2ee}
+Bodoff, Stephanie, ed. The J2EE tutorial. Addison-Wesley Professional, 2002.
 
 \bibitem{jsr88}
 JSR-000088, Deployment API Specification, \url{http://jcp.org/aboutJava/communityprocess/mrel/jsr088/index.html}.
