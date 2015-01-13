@@ -88,24 +88,8 @@ Applications in multiple packages, which are called as \emph{modular application
 
 To solve the problem, the dependencies need to be reconstructed. Intuitively, this can be done manually. The developer should have the knowledge of dependent configuration among the application modules and be aware the affection scope of the redeployment. Then they can redeploy the dependent ones by hand. However, this requires human intervention can be strenuous and even error-prone, especially for large-scale application. Alternatively, they can also redeploy all the modules for that application. But it is not only unnecessary but also cause the state of unaffected part to be destructed, such as data storage module which is hardly updated. 
 
+In this paper, we introduce a general approach to enable the correct hot deployment respecting the dependencies among modules. The dependencies are constructed with class loaders for the modules and upon the dependent modules can be calculated and their hot deployment can be triggered. In order to update flexibly and efficiently, dependency reconstruction can be done in the class loaders. We can get and manage dependencies from the static module profiles or by dynamic way during hot deployment, so that dependent modules only update their class loaders and they don't need to do anything else except class loading in the process of redeployment. Experiment shows the problem of calling failure can be solved through this technology and the efficiency of application servers is improved.
 
-In this paper, we introduce a general approach to enable the correct hot deployment respecting the dependencies among modules. The dependencies are constructed with  class loaders for the modulars and upon the dependent modulars can be calculated and  their hot deployment can be triggered. In order to update flexibly and efficiently, we put dependency management and maintenance in module class loaders. Dependency reconstruction will be done in the class loaders, so that dependent modules only update their class loaders and they don't need to do anything else except class loading in the process of redeployment.
-
-
-
-% Application servers can also carry out the redeploy process automatically as . In this way, dependencies are reconstructed and dependent modules will be handled through plenty of steps from the deployment process. Actually, depended modules are the updated modules and updating dependent modules is just for reconstruct dependencies.
-%This causes application servers inefficient and also causes hot deployment inflexibility.
-
-%In a word, modularity and modular applications can be found everywhere and they are generally accepted by researchers and software developers.
-%But there are two problems in modular applications which we have to face.
-%The one is isolation and sharing between modules and we call it isolation-sharing problem. 
-%Developers must consider how to isolate core modules and how to share general modules.
-%The other problem that we call it update-maintenance problem is related to software maintenance.
-%How to update and maintain different module versions and replace modules flexibly is quite a hard problem.
-
-
-
-%In this paper, we analyze reasons of failures and a technology of hot deployment with dependency reconstruction is introduced.
 The rest of this paper is organized as follow. 
 Section \ref{sec:background} reviews the hot deployment mechanism and analyzes reasons of failures based on hot deployment mechanism. 
 Section \ref{sec:reconstructionAS} describes dependency reconstruction in application servers, which is a common approach to solve dependency lost.
@@ -286,7 +270,7 @@ So dependency graph is created by profiles of all the modules.
 The dependent class loaders will be set in the class loader of each module.
 
 \begin{algorithm}[h]
-\caption{function loadClass of Circle Class Loader}
+\caption{function loadClass of \emph{Circle Class Loader}}
 \label{alg:Circle_Class_Loader}
 \begin{algorithmic}[1]
 \REQUIRE ~~\\
@@ -326,8 +310,8 @@ The loaded class instance: $c$
 \end{algorithmic}
 \end{algorithm}
 
-We implement Circle Class Loader with static dynamic management.
-Algorithm \ref{alg:Circle_Class_Loader} shows Circle Class Loader how to load classes. 
+We implement \emph{Circle Class Loader} with static dynamic management.
+Algorithm \ref{alg:Circle_Class_Loader} shows \emph{Circle Class Loader} how to load classes. 
 The class loader will try the dependent class loaders to load classes at first. 
 We regard the system class loader as a dependent class loader of each module class loader to guarantee the safe loading of system classes. 
 The dependency graph probably has a circle so that there must be a circle detection in the algorithm of loading classes. 
@@ -343,9 +327,9 @@ We need to reconstruct their dependencies too in the same way, until there is no
 All the affected modules should own their new class loader instance instead of the old one, because the old class loader has the cache of old classes and it cannot load the new classes with the same name.
 Replacing the old class loaders is the most convenient way to update modules and reconstruct dependencies.
 Meanwhile, updating the old class loader instances and dependencies is necessary.
-In Circle Class Loader, reconstruction process is similar to the process of creating dependency graph. 
-The graph and Circle Class Loaders are updated by the new version of profiles before the loading of classes. 
-The dependencies are managed in the Circle Class Loaders based on the static profiles of modules.
+In \emph{Circle Class Loader}, reconstruction process is similar to the process of creating dependency graph. 
+The graph and \emph{Circle Class Loaders} are updated by the new version of profiles before the loading of classes. 
+The dependencies are managed in \emph{Circle Class Loaders} based on the static profiles of modules.
 
 
 % the following is not updated.
@@ -371,7 +355,7 @@ The dependencies are managed in the Circle Class Loaders based on the static pro
 	\label{fig:subfig:c}
 	\includegraphics[height=1.4in]{LoadingQueueC.pdf}
 }
-\caption{details of loading classes via ADR Class Loader}
+\caption{details of loading classes via Adaptive Class Loader}
 \label{fig:loading_queue}
 \end{figure*}
 
@@ -405,10 +389,11 @@ With more classes loaded successfully, more class loaders will be put in the rep
 Thus, \emph{ComputeBean} can be loaded successfully at the second time by the class loader in the repository as presented in Fig.\ref{fig:subfig:c}.
 If a class loader in the repository loads the other class successfully, that means it is the dependent class loader of the other class loader and the dependency is created in the class loader incidentally. 
 Finally, the loading queue becomes empty and all the classes are loaded with the dependencies.
+Without static profiles, module class loaders create dependencies dynamically while loading classes, so we call this type of module class loader \emph{Adpative Class Loader}.
 
 If hot deployment happens, the old version classes in the repository must be removed and their related dependencies must be dropped. 
 Then, the new version classes are also placed in the loading queue and the process is just like deployment process. 
-The idea of dependency reconstruction in dynamic dependency management is similar with it in static dependency management. 
+Dependency reconstruction in dynamic dependency management is similar with it in static dependency management. 
 We can find out all the dependent modules group by group. 
 No matter whether these modules have the new version, they must be removed in the repository as the old ones and then put them in the loading queue to be reloaded. 
 So, all the lost dependences will be reconstructed by taking the place of the original class loaders and their dependent class loaders. 
@@ -421,8 +406,8 @@ Even though adaptive way to load class is time consuming, avoiding editing depen
 \subsection{Class Loader with Lazy Reconstruction}
 
 \begin{algorithm}[h]
-\caption{function loadClass of ADRD Class Loader}
-\label{alg:ADRD_Class_Loader}
+\caption{function loadClass of \emph{Delay Class Loader}}
+\label{alg:Delay_Class_Loader}
 \begin{algorithmic}[1]
 \REQUIRE ~~\\
 Fully qualified name of the class: $name$ \\
@@ -504,21 +489,23 @@ The loaded class instance: $c$
 \end{algorithmic}
 \end{algorithm}
 
-Adaptive Dependency Reconstruction Delay Class Loader(ADRD Class Loader) inherits Adaptive Dependency Reconstruction Class Loader(ADR Class Loader).
-Comparing with ADR Class Loader, ADRD Class Loader delays dependency reconstruction when hot deployment happens.
-All the affected class loaders only mark as invalid class loaders and none of class loaders are updated.
-So, dependency reconstruction will happen when applications are executed.
+\emph{Delay Class Loader} is a type of module class loader with lazy reconstruction.
+Comparing with \emph{Adaptive Class Loader}, \emph{Delay Class Loader} delays dependency reconstruction when hot deployment happens.
+It is lazy for \emph{Delay Class Loader} to reconstruct dependencies at once. 
+So all the affected class loaders only mark as invalid class loaders and none of class loaders are updated after hot deployment.
+Dependency reconstruction will happen when applications are executed.
+Because in this time, \emph{Delay Class Loaders} have to reconstruct dependencies to ensure the correctness of applications.
 If the class loader is invalid, we should update and reconstruct it before using it to load classes. 
-The algorithm of loading class is described in Algorithm \ref{alg:ADRD_Class_Loader}, which uses the loading rules of ADR Class Loader.
-Similarly, dependency reconstruction process is also as the same as the reconstruction process of ADR Class Loader.
+The algorithm of loading class is described in Algorithm \ref{alg:Delay_Class_Loader}, which uses the loading rules of \emph{Adaptive Class Loader}.
+Similarly, dependency reconstruction process is also as the same as the reconstruction process of \emph{Adaptive Class Loader}.
 Their main difference is their reconstruction time.
-ADRD Class Loader reconstructs dependencies when applications are executed, so that it may save the time of hot deployment and avoid reconstruction if users never execute some modules after updating them.
+\emph{Delay Class Loader} reconstructs dependencies when applications are executed, so that it may save the time of hot deployment and avoid reconstruction if users never execute some modules after updating them.
 
-%\subsection{Contribution}
+\subsection{Contribution}
 Our contribution is to propose a technology of hot deployment with dependency reconstruction.
 From an engineering point of view, hot deployment with dependency reconstruction solves the problem of hot deploying modular applications in practical engineering projects.
 Particularly, we customize the class loader which can manage dependencies of modules.
-Then we can reconstruct dependencies in the class loader in order to improve the efficiency of hot deployment.
+Then we can reconstruct dependencies in the class loader, so that we improve the efficiency of hot deployment.
 In the future, we can split a module into several sub modules or assemble some sub modules of different modules according their original dependencies.
 Each class loader only the loads classes of corresponding sub modules.
 So reconstruction in class loaders reduces the granularity of the update and narrows the scope of the hot deployment.
@@ -587,8 +574,8 @@ jbossxts.sar		&	52ms			&	860ms			&	912ms			&	5.7\%\\
 \end{tabular}
 \end{table*}
 
-Comparing with JBoss AS 5.1.0, the application server extension needs more time to hot deploy modules because the server searches dependencies in the reverse dependency table and deploys more dependent modules.
-But this kind of dependency reconstruction can guarantee the correctness of hot deployment without restarting application servers.
+Comparing with JBoss AS 5.1.0, the application server extension, using dependency reconstruction in application servers, needs more time to hot deploy modules because the server searches dependencies in the reverse dependency table and deploys more dependent modules.
+But this type of dependency reconstruction can guarantee the correctness of hot deployment without restarting application servers.
 Obviously, the hot deployment with dependency reconstruction which can avoid restarting servers is more efficient.
 
 Reconstruction in application servers is a native way to solve the call failures because many dependent modules of original versions are redeployed after the depended modules.
@@ -603,7 +590,7 @@ So we save the time used to create and set the deployment context in the redeplo
 
 Table \ref{tab:stage} shows the cost of redeployment in these two stages for some modules and applications.
 Compute.jar and Validator.jar are two session beans which constitute an example application of division in Fig. \ref{fig:example}.
-Java Pet Store\cite{java_pet_store} is a sample well-known application from the J2EE, so it is also one of our subjects.
+Java Pet Store\cite{java_pet_store} is a sample well-known application from the J2EE\cite{j2ee}, so it is also one of our subjects.
 The rest testing modules are services of JBoss, which can be found in the examples directory of JBossAS 5.1.0 Release.
 We hot deploy them when the application server is running and calculate the time cost of the configuration stage and distribution stage.
 In our approach of reconstruction in class loaders, the time cost of the configuration stage will be saved when hot deployment happens.
@@ -611,14 +598,14 @@ Moreover, dependent modules won't update themselves in the deployment directory 
 The efficiency is highly improved according to the promotion rate of Table \ref{tab:stage}.
 
 \subsection{Dynamic Feature}
-Comparing with CDR Class Loader based on static dependency management, ADR Class Loader and ADRD Class Loader can obtain the dependencies of modules in the dynamic way.
+Comparing with \emph{Circle Class Loader} based on static dependency management, \emph{Adaptive Class Loader} and \emph{Delay Class Loader} can obtain the dependencies of modules in the dynamic way.
 By several trying, we can create the dependency graph on the basis of whether the class is loaded successfully.
 Developers don't configure the profile of modules to describe the dependencies of the modules.
 The dependencies are managed and reconstructed dynamically at any time.
 
 Actually, static dependency management is more efficient than dynamic dependency management in terms of deployment and redeployment time.
 Distribution stage accounts for a large proportion of the total deployment process according to Table \ref{tab:stage}.
-ADR Class Loader and ADRD Class Loader may try to load a class for many times if this class depends on other classes which are packaged in different modules.
+\emph{Adaptive Class Loader} and \emph{Delay Class Loader} may try to load a class for many times if this class depends on other classes which are packaged in different modules.
 
 However, the advantage of dynamic feature is reducing management of modules for developers.
 As we know, enterprise applications probably contain hundreds of modules and complex dependencies.
@@ -637,9 +624,9 @@ Additionally, dynamic feature makes hot deployment more flexible, which we will 
 \emph{Loading Strategy}	& \emph{Deploy and Execute All}	& \emph{Redeploy and Execute All} & \emph{Redeploy and Execute One}\\
 \hline
 \hline
-ADR Class Loader 	&	94ms				&	142ms				&	52ms\\
+Adative Class Loader 	&	94ms				&	142ms				&	52ms\\
 \hline
-ADRD Class Loader 	&	92ms				&	137ms				&	43ms\\
+Delay Class Loader 	&	92ms				&	137ms				&	43ms\\
 \hline
 \end{tabular}
 \end{table*}
@@ -655,14 +642,14 @@ The class loader is an important part in application servers based on J2EE.
 Reconstruction in class loaders make hot deployment more flexible.
 On the one hand, dynamic dependency management allows class loaders to construct dependencies in the attempt to load classes without configuration files.
 On the other hand, reconstruction can be carried out at any time before execution of applications.
-The dependency reconstruction of ADR Class Loader is in the process of hot deployment, which means the class loaders finish reconstructing dependencies when the application servers complete hot deployment.
-In contrast, ADRD Class Loader which should be reconstructed is marked as invalid when hot deployment happens.
+The dependency reconstruction of \emph{Adaptive Class Loader} is in the process of hot deployment, which means the class loaders finish reconstructing dependencies when the application servers complete hot deployment.
+In contrast, \emph{Delay Class Loader} which should be reconstructed is marked as invalid when hot deployment happens.
 The class loaders and their dependencies won't be updated until the applications start to be executed.
 So, we handle invalid class loaders and reconstruct them at the time of application execution.
-Comparing with ADR Class Loader, ADRD Class Loader delays reconstruction and increase the flexibility of reconstruction.
+Comparing with \emph{Adaptive Class Loader}, \emph{Delay Class Loader} delays reconstruction and increase the flexibility of reconstruction.
 
-In a particular application scenario, ADRD Class Loader has a good performance. 
-We compare performance of flexible reconstruction between ADR Class Loader and ADRD Class Loader through experiments.
+In a particular application scenario, \emph{Delay Class Loader} Class Loader has a good performance. 
+We compare performance of flexible reconstruction between \emph{Adaptive Class Loader} and \emph{Delay Class Loader} through experiments.
 We choose a simple modular application with three modules A, B and C.
 Module A depends on Module B and C, which is described as profile of Module A in Fig.\ref{fig:xml_pic}.
 Then we copy this application for 20 times and build 20 modular applications with identification from 1 to 20.
@@ -670,7 +657,7 @@ In the experiment, we deploy 20 applications with 60 modules in the application 
 Then we hot deploy Module B of all the applications.
 To ensure the correctness of applications, module A and B need to be reconstructed.
 After redeployment, we execute all the applications so that all of class loaders finish reconstructing.
-If we execute only one of applications, only ADRD Class Loader of this application modules will complete reconstruction.
+If we execute only one of applications, only \emph{Delay Class Loader} of this application modules will complete reconstruction.
 So, the time of hot deployment and execution decreases in Table \ref{tab:flexibility}. 
 
 
@@ -705,7 +692,7 @@ In this way, we will decrease the granularity of update and reconstruction.
 Hot deployment mechanism is one of the typical features of mainstream application servers.
 However, mainstream application servers cannot meet the demand with hot deployment of modular applications.
 This paper proposes a technology of hot deployment with dependency reconstruction.
-In order to make hot deployment becomes more flexible and efficient, dependency reconstruction is implemented by several ways.
+In order to make hot deployment becomes more flexible and efficient, dependency reconstruction is implemented by several ways, including static profiles way, adaptive loading way and dynamic management with lazy reconstruction.
 Experiment shows the problem of calling failure can be solved through this technology and the efficiency of application servers is improved.
 
 In future, we will focus on reconstruction in class loaders.
@@ -738,12 +725,6 @@ Oracle WebLogic Server, \url{http://www.oracle.com/technetwork/middleware/weblog
 \bibitem{middleware_reliability}
 Huang, Gang, et al. "Simulation-based analysis of middleware service impact on system reliability: Experiment on Java application server." Journal of Systems and Software 84.7 (2011): 1160-1170.
 
-\bibitem{DI}
-Fowler, Martin. "Inversion of control containers and the dependency injection pattern." (2004).
-
-\bibitem{EJB}
-JSR 220: Enterprise JavaBeans\textsuperscript{\texttrademark} 3.0, \url{https://www.jcp.org/en/jsr/detail?id=220}.
-
 \bibitem{standard_cl}
 Taylor, B. "Java Class Loading: The Basics." (2003).
 
@@ -752,6 +733,13 @@ Gangadharan, Binod Pankajakshy, Srikanth Padakandla, and Sivakumar Melapannai Th
 
 \bibitem{jboss_class_loader}
 The JBoss JMX Microkernel, \url{http://docs.jboss.org/jbossas/jboss4guide/r5/html/ch2.chapter.html}.
+
+\bibitem{DI}
+Fowler, Martin. "Inversion of control containers and the dependency injection pattern." (2004).
+
+\bibitem{EJB}
+JSR 220: Enterprise JavaBeans\textsuperscript{\texttrademark} 3.0, \url{https://www.jcp.org/en/jsr/detail?id=220}.
+
 
 \bibitem{jvm}
 Java Virtual Machine, \url{http://java-virtual-machine.net/sun-java-virtual-machine.html}.
@@ -771,14 +759,14 @@ Rohit Chaudhri. "Understnding the Java Classloading Mechanism." Java Developer's
 \bibitem{class_loader_patent}
 Meduri, Subbarao K., Thomas Edward Musta, and James Lee Van Oosten. "Collaborative classloader system and method." U.S. Patent No. 7,870,546. 11 Jan. 2011.
 
-\bibitem{j2ee}
-Bodoff, Stephanie, ed. The J2EE tutorial. Addison-Wesley Professional, 2002.
-
 \bibitem{jsr88}
 JSR-000088, Deployment API Specification, \url{http://jcp.org/aboutJava/communityprocess/mrel/jsr088/index.html}.
 
 \bibitem{java_pet_store}
 Java Pet Store, \url{http://www.oracle.com/technetwork/java/petstore1-3-1-02-139690.html}.
+
+\bibitem{j2ee}
+Bodoff, Stephanie, ed. The J2EE tutorial. Addison-Wesley Professional, 2002.
 
 
 

@@ -7,11 +7,12 @@
 \BOOKMARK [2][-]{subsection.4.1}{Class Loader with Static Management}{section.4}% 7
 \BOOKMARK [2][-]{subsection.4.2}{Class Loader with Dynamic Management}{section.4}% 8
 \BOOKMARK [2][-]{subsection.4.3}{Class Loader with Lazy Reconstruction}{section.4}% 9
-\BOOKMARK [1][-]{section.5}{Evaluation}{}% 10
-\BOOKMARK [2][-]{subsection.5.1}{Experiment}{section.5}% 11
-\BOOKMARK [2][-]{subsection.5.2}{Efficiency}{section.5}% 12
-\BOOKMARK [2][-]{subsection.5.3}{Dynamic Feature}{section.5}% 13
-\BOOKMARK [2][-]{subsection.5.4}{Flexibility}{section.5}% 14
-\BOOKMARK [1][-]{section.6}{Related work}{}% 15
-\BOOKMARK [1][-]{section.7}{Conclusion and future work}{}% 16
-\BOOKMARK [1][-]{section*.11}{References}{}% 17
+\BOOKMARK [2][-]{subsection.4.4}{Contribution}{section.4}% 10
+\BOOKMARK [1][-]{section.5}{Evaluation}{}% 11
+\BOOKMARK [2][-]{subsection.5.1}{Experiment}{section.5}% 12
+\BOOKMARK [2][-]{subsection.5.2}{Efficiency}{section.5}% 13
+\BOOKMARK [2][-]{subsection.5.3}{Dynamic Feature}{section.5}% 14
+\BOOKMARK [2][-]{subsection.5.4}{Flexibility}{section.5}% 15
+\BOOKMARK [1][-]{section.6}{Related work}{}% 16
+\BOOKMARK [1][-]{section.7}{Conclusion and future work}{}% 17
+\BOOKMARK [1][-]{section*.11}{References}{}% 18
