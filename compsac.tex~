@@ -88,9 +88,7 @@ Applications in multiple packages, which are called as \emph{modular application
 
 To solve the problem, the dependencies need to be reconstructed. Intuitively, this can be done manually. The developer should have the knowledge of dependent configuration among the application modules and be aware the affection scope of the redeployment. Then they can redeploy the dependent ones by hand. However, this requires human intervention can be strenuous and even error-prone, especially for large-scale application. Alternatively, they can also redeploy all the modules for that application. But it is not only unnecessary but also cause the state of unaffected part to be destructed, such as data storage module which is hardly updated. 
 
-
 In this paper, we introduce a general approach to enable the correct hot deployment respecting the dependencies among modules. The dependencies are constructed with class loaders for the modules and upon the dependent modules can be calculated and their hot deployment can be triggered. In order to update flexibly and efficiently, dependency reconstruction can be done in the class loaders. We can get and manage dependencies from the static module profiles or by dynamic way during hot deployment, so that dependent modules only update their class loaders and they don't need to do anything else except class loading in the process of redeployment. Experiment shows the problem of calling failure can be solved through this technology and the efficiency of application servers is improved.
-
 
 The rest of this paper is organized as follow. 
 Section \ref{sec:background} reviews the hot deployment mechanism and analyzes reasons of failures based on hot deployment mechanism. 
@@ -108,25 +106,31 @@ In this section, the hot deployment mechanism of current application servers are
 
 Hot deployment built in mainstream application servers enables applications on the servers to be are published, updated or withdrawn without restarting the servers. This feature is based on the class loading mechanism beyond the standard class loaders\cite{standard_cl} in Java system. Conceptually, each module, as an standard alone application, to be deployed has its own class loader instead of sharing one with other modules so that standalone applications in that module can be independently operated. All the effective module class loaders are organized together (in a chain or pool) so that they can find each other and delegate each other to load classes and resources which enables the mutual referring and sharing among the modules. When some module are hot deployed, the corresponding module class loader will be removed and a new one will be created to load the new version of the module. In this way, application servers complete hot deployment of applications\cite{module_cl}.
 
-\begin{figure}[!t]
+\begin{figure}[ht]
 \centering
 \includegraphics[width=2.5in]{JBossClassLoader.pdf}
 \caption{class loader architecture in JBoss}
 \label{fig:jboss_class_loader}
 \end{figure}
 
-Fig. \ref{fig:jboss_class_loader} shows an illustrative architecture of class loading in JBoss and other application servers adopt similar designs. As for JBoss, \emph{Sytem ClassLoaders} and \emph{ServerLoader} are responsible to load JBoss server itself. The most important class loader is \emph{UnifiedClassLoader}, which covers EARs, JARs, WARs, SARs and directories seen by the deployment scanner as well as JARs referenced by their manifests and any nested deployment units they may contain\cite{jboss_class_loader}. For example, if the division EJB application shown in Fig.\ref{fig:example} is deployed in JBoss, \emph{EJB DynClassLoader} and \emph{EJB ENCLoader} are responsible for loading the classes in this EJB applications. Finally, \emph{UnifiedClassLoader} is delegated to load classes and each \emph{UnifiedClassLoader} instance is placed in \emph{UnifiedLoaderRepository} after finishing class loading. Because each \emph{UnifiedClassLoader} instance is responsible for only one module, it is just a module class loader which helps JBoss achieve hot deployment.
+Fig. \ref{fig:jboss_class_loader} shows an illustrative architecture of class loading in JBoss and other application servers adopt similar designs.
+As for JBoss, \emph{Sytem ClassLoaders} and \emph{ServerLoader} are responsible to load JBoss server itself. 
+The most important class loader is \emph{UnifiedClassLoader}, which covers EARs, JARs, WARs, SARs and directories seen by the deployment scanner as well as JARs referenced by their manifests and any nested deployment units they may contain\cite{jboss_class_loader}. 
+For a divison EJB\cite{EJB} application as an example in Fig.\ref{fig:example}, class ComputeBean is a sesion Bean for computing divsion and class ValidatorBean is another session bean to verify the divior is zero or not.
+Class ComputeBean is packaged in a module named Compute.jar while class ValidatorBean is packaged in the other module named Validator.jar.
+These two modules make up this EJB modular application with dependency injection\cite{DI}.
+If this application is deployed in JBoss, \emph{EJB DynClassLoader} and \emph{EJB ENCLoader} are responsible for loading the classes in this EJB applications. Finally, \emph{UnifiedClassLoader} is delegated to load classes and each \emph{UnifiedClassLoader} instance is placed in \emph{UnifiedLoaderRepository} after finishing class loading. Because each \emph{UnifiedClassLoader} instance is responsible for only one module, it is just a module class loader which helps JBoss achieve hot deployment.
 
-\begin{figure}[!t]
+\begin{figure}[ht]
 \centering
 \includegraphics[width=3.5in]{ExampleEJB.pdf}
 \caption{a modular application and main source codes}
 \label{fig:example}
 \end{figure}
 
-However, most applications are modular applications which are consisted of more than one module containing one or more classes.
-Fig.\ref{fig:example} is an easy modular application with dependency injection\cite{DI}, which has two EJB\cite{EJB} components deployed in the application server.
-From the source codes of two classes, the dependency reflects in the divisor must be check whether it is zero when calculating the division of two numbers.
+%\textcolor{red}{However, most applications are modular applications which are consisted of more than one module containing one or more classes.
+%}Fig.\ref{fig:example} is an easy modular application with dependency injection\cite{DI}, which has two EJB\cite{EJB} components deployed in the application server.
+From the source codes of two classes in Fig.\ref{fig:example}, the dependency reflects in the divisor must be check whether it is zero when calculating the division of two numbers.
 So, in modular applications, a module can be defined as $M=<C, L, R>$. 
 $C=\{c_1, c_2, c_3\cdots\}$ is the set of classes in that module. 
 $L$ is a module class loader to load all the classes in the class set $C$.
@@ -137,19 +141,19 @@ Validator.jar is a dependent module used to verify the divisor and $R = \emptyse
 
 \subsection{Hot Deployment Failures Caused by Module Dependency}
 
-The current application servers have hot deployment capabilities using module class loader architecture.
-If a single module as an application hot deploys, the module class loader will also update with it and application will be running regularly.
+\textcolor{red}{The current application servers have hot deployment capabilities using module class loader architecture.
+}\textcolor{red}{If a single module as an application hot deploys, the module class loader will also update with it and application will be running regularly.
 However, if a modular application deploys in application servers and only the depended module is hot deployed, hot deployment failures will occur when we execute this modular application.
 The reason is that module class loaders load classes from each module separately.
 When only a depended module updating online, its original module class loader will be replaced by a new module class loader.
 But the module class loader of dependent module still exists, and the module it depends is still an old version which has been removed.
 Thus, dependency loss occurs and calling the depended module again will result in call failure.
-
-For the division application, when two modules are deployed, the classes in the modules are loaded by module class loaders shown in Fig.\ref{fig:example_jvm}. 
+}
+For the sample application, when two modules are deployed, the classes in the modules are loaded by module class loaders shown in Fig.\ref{fig:example_jvm}. 
 Hot deployment required that each module must have its own class loader instance, so that Class Loader $C$ loads Class \emph{ComputeBean} in Compute.jar while Class Loader $V$ loads Class \emph{ValidatorBean} in Validator.jar.
 After class loading, the information of Class \emph{ComputeBean} and Class \emph{ValidatorBean} is resolved and is stored in their own class structure in the Java virtual machine (JVM). 
-JVM is the cornerstone of the Java platforms. It is the component of the technology responsible for its hardware and operating system independence, the small size of its compiled code, and its ability to protect users from malicious programs\cite{jvm}. 
-Here we focus on several class information stored in the class structure. 
+%JVM is the cornerstone of the Java platforms. It is the component of the technology responsible for its hardware and operating system independence, the small size of its compiled code, and its ability to protect users from malicious programs\cite{jvm}. 
+%Here we focus on several class information stored in the class structure. 
 Field table which labeled \emph{field\_info} is used to describe the variables declared in the class. 
 Method table which labeled \emph{method\_info} is used to describe the methods of the class. 
 These two tables have many attributes. 
@@ -169,7 +173,7 @@ At this moment, the dependency that JVM creates at the first deployment is lost.
 The index of original class structure of Class \emph{ComputeBean} still points to the original class structure of Class \emph{ValidatorBean} which is old version and will be removed after redeployment of Validator.jar with the new version of Class \emph{ValidatorBean}. 
 That is why call failure occurs when executing the method that calls the method of Class \emph{ValidatorBean}.
 
-\begin{figure}[!t]
+\begin{figure}[ht]
 \centering
 \includegraphics[width=3.5in]{ExampleJVM.pdf}
 \caption{a modular application and loading details}
@@ -182,8 +186,8 @@ That is why call failure occurs when executing the method that calls the method 
 \section{Dependency Reconstruction in Application Servers\label{sec:reconstructionAS}}
 
 To support hot deployment of modular applications, the key is reconstructing the lost dependencies.
-The basic idea of dependency reconstruction is to ensure consistency of modules and their dependencies.
-The consistency is not only for the updating modules, but also for the original modules which depend on the updating modules.
+\textcolor{red}{The basic idea of dependency reconstruction is to ensure consistency of modules and their dependencies.
+The consistency is not only for the updating modules, but also for the original modules which depend on the updating modules.}
 We need to manage and maintain all the dependencies when modular applications are deployed at the first time, so that we can find out the dependent modules when hot deployment happens.
 
 Suppose that Validator.jar is redeploy by a new version and Compute.jar makes no change in the above example shown in Fig.\ref{fig:example}. 
@@ -197,7 +201,7 @@ Through the dependency injector, the deployment unit context of Compute.jar can 
 Because of dependencies, the depended module Validator.jar must be deployed and loaded before the dependent module Compute.jar. 
 Finally, all of them finish deployment.
 
-\begin{figure}[!t]
+\begin{figure}[ht]
 \centering
 \includegraphics[width=2.2in]{ProcessReconstructionAS.pdf}
 \caption{dependency reconstruction in application servers}
@@ -271,7 +275,7 @@ For example, a profile named \emph{Compute.xml} in the module Compute.jar record
 So dependency graph is created by profiles of all the modules. 
 The dependent class loaders will be set in the class loader of each module.
 
-\begin{algorithm}[h]
+\begin{algorithm}[ht]
 \caption{function loadClass of \emph{Circle Class Loader}}
 \label{alg:Circle_Class_Loader}
 \begin{algorithmic}[1]
@@ -338,7 +342,7 @@ The dependencies are managed in \emph{Circle Class Loaders} based on the static 
 
 \subsection{Class Loader with Dynamic Management}
 
-\begin{figure*}[!t]
+\begin{figure*}[ht]
 \centering
 \subfloat[loading ComputeBean]
 {
@@ -361,7 +365,7 @@ The dependencies are managed in \emph{Circle Class Loaders} based on the static 
 \label{fig:loading_queue}
 \end{figure*}
 
-\begin{figure}[!t]
+\begin{figure}[ht]
 \centering
 \includegraphics[width=2.2in]{ProcessReconstructionCL.pdf}
 \caption{dependency reconstruction in class loaders}
@@ -407,7 +411,7 @@ Even though adaptive way to load class is time consuming, avoiding editing depen
 
 \subsection{Class Loader with Lazy Reconstruction}
 
-\begin{algorithm}[h]
+\begin{algorithm}[ht]
 \caption{function loadClass of \emph{Delay Class Loader}}
 \label{alg:Delay_Class_Loader}
 \begin{algorithmic}[1]
@@ -633,7 +637,7 @@ Delay Class Loader 	&	92ms				&	137ms				&	43ms\\
 \end{tabular}
 \end{table*}
 
-\begin{figure}[!t]
+\begin{figure}[ht]
 \centering
 \includegraphics[width=3.5in]{xmlpicture.pdf}
 \caption{A-JAR.xml file}
