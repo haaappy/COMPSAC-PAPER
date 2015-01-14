@@ -228,51 +228,41 @@ This causes application servers inefficient and also causes hot deployment infle
 %// disadvantages
  
  
-\section{Dependency Reconstruction in Class Loaders\label{sec:reconstructionCL}}
+\section{Dependency Reconstruction with Class Loaders\label{sec:reconstructionCL}}
 
-Application servers can manage dependencies of modules via the reverse dependency mapping table.
-when hot deployment occurs, the reverse dependency mapping table helps application servers to search the dependent modules.
-Dependencies of these modules are lost and they must be reconstructed.
-However, these modules are still original versions.
-Most of the work in redeploying dependent modules makes no sense except class loading in the modules.
-Dependency management and reconstruction should be handled in the class loader.
-Then dependent modules just need to reload the classes to reconstruct dependencies and most of the deployment process is omitted.
-Updating efficiency is greatly improved.
+Building the dependency reconstruction process into the deployment procedure suffers from inefficiency or even infeasibility. 
 
-Because each module has its own class loader, the dependencies of modules are just the dependencies of class loaders.
-Each class loader that represents each module should record which class loaders it depends on.
-At the same time, the class loader of the depended module should record what depends on itself as the reverse dependencies.
-So, each class loader may have one or more depended class loaders and dependent class loaders.
-All the information is collected when classes are loaded at the first time and their class loaders maintenance these important dependency information. 
-From an overall perspective, these module class loaders constitute a dependency graph.
-Every vertex of this graph can be regard as a class loader or a related module and every edge represents a dependency from one class loader to another.
+Because each module has its own class loader, the dependencies of modules are just the dependencies of class loaders. It's more direct to have the class loaders to maintain the dependencies among the modules that they are responsible to load. 
 
-The classes which are implemented by developers will be loaded by module class loader created in the deployment process, but the system classes, such as String, Object and so on, require system class loader or even bootstrap class loader to load them.
-Parent delegation mechanism\cite{parent_delegation} ensures the safety and uniqueness of system classes.
-This loading strategy gives priority to load class by parent class loader.
-Bootstrap class loader has the highest priority and the next is extension class loader and system class loader.
-The last is our module class loader which is defined by us.
 
-Generally, there should be a parent class loader called system class loader in each module class loader.
-This parent class loader can be treated as a depended class loader because the original class really depends on the system class which loaded by its parent class loader.
-Based on parent delegation and our dependency graph for module class loaders, our class loader architecture model is organized in both a class loader hierarchy and a class loader network\cite{class_loader_patent}.
+\subsection{Class loading respecting dependency}
 
-\begin{comment}
-As we know, class loader is an important concept in Java projects and application servers based on J2EE\cite{j2ee}.
-We implement to three safe and reliable module class loaders to support hot deployment of dependency reconstruction.
-They are Circle Dependency Reconstruction Class Loader(CDR Class Loader) with static dependency management, Adaptive Dependency Reconstruction Class Loader(ADR Class Loader) and Adaptive Dependency Reconstruction Delay Class Loader(ADRD Class Loader) with dynamic dependency management.
-Our customized class loaders not also complete basic class loading, but also maintain and reconstruct dependencies.
-Thus, hot deployment and dependency reconstruction becomes more flexible and efficient.
-\end{comment}
+Designing a class loading mechanism for module application involves three basic considerations. Firstly, the loader should be able to load the classes in the modules correctly.  Secondly, the loader should able to resolve the dependencies among classes from different modules. Lastly, the loaders should be able to reconstruct the dependencies upon some of the modules are update later.
 
-\subsection{Class Loader with Static Management}
 
-Static dependency management is based on profiles of modules. 
-The profile describes the module information including dependencies and main classes. 
-It is named after the module in order to manage the module with a unified identification. 
-For example, a profile named \emph{Compute.xml} in the module Compute.jar records the dependencies of Compute.jar. 
-So dependency graph is created by profiles of all the modules. 
-The dependent class loaders will be set in the class loader of each module.
+
+The loading process for one module can be defined as three steps. 
+\begin{itemize}
+\item try use the system loaders to load
+\item try use itself to load
+\item try use its dependent class loaders to load
+\end{itemize}
+
+The first step is in charge to complete the loading of fundamental classes, such as those in java.lang.*, with system class loaders respecting the parent delegation policy.  By this means,  the safety and uniqueness of system classes are guaranteed. This loading strategy gives priority to load class by parent class loader. Bootstrap class loader has the highest priority and the next is extension class loader and system class loader. 
+
+If the class to load is not a fundamental class, the class loader will try to load it by itself. So that the classes in the same module are visible to each other.
+
+If the class is in the same module, it may come from the module that the one corresponding to the current loader. So the class loader should delegate the dependent modules' class loaders to resolve the class for it.
+
+
+We implement \emph{Circle Class Loader} with static dynamic management.
+Algorithm \ref{alg:Circle_Class_Loader} shows \emph{Circle Class Loader} how to load classes. 
+The class loader will try the dependent class loaders to load classes at first. 
+We regard the system class loader as a dependent class loader of each module class loader to guarantee the safe loading of system classes. 
+The dependency graph probably has a circle so that there must be a circle detection in the algorithm of loading classes. 
+Under the definition of module dependency, class set $C$, class loader $L$ and dependencies $R$ of each module $M$ are determined from the dependency graph. 
+Moreover, we can obtain the dependent class loader list of $L$ from each class loader of each module in $R$, which represents \emph{depArrayList} in Algorithm \ref{alg:Circle_Class_Loader}. 
+
 
 \begin{algorithm}[ht]
 \caption{function loadClass of \emph{Circle Class Loader}}
@@ -315,13 +305,6 @@ The loaded class instance: $c$
 \end{algorithmic}
 \end{algorithm}
 
-We implement \emph{Circle Class Loader} with static dynamic management.
-Algorithm \ref{alg:Circle_Class_Loader} shows \emph{Circle Class Loader} how to load classes. 
-The class loader will try the dependent class loaders to load classes at first. 
-We regard the system class loader as a dependent class loader of each module class loader to guarantee the safe loading of system classes. 
-The dependency graph probably has a circle so that there must be a circle detection in the algorithm of loading classes. 
-Under the definition of module dependency, class set $C$, class loader $L$ and dependencies $R$ of each module $M$ are determined from the dependency graph. 
-Moreover, we can obtain the dependent class loader list of $L$ from each class loader of each module in $R$, which represents \emph{depArrayList} in Algorithm \ref{alg:Circle_Class_Loader}. 
 
 If updating is detected, some affected class loaders and dependencies must be modified.
 However, modifying the changing class loaders and their dependencies is not enough because dependencies may be lost while hot deploying depended modules.
@@ -338,7 +321,80 @@ The dependencies are managed in \emph{Circle Class Loaders} based on the static 
 
 
 
-\subsection{Class Loader with Dynamic Management}
+
+%Application servers can manage dependencies of modules via the reverse dependency mapping table.
+%when hot deployment occurs, the reverse dependency mapping table helps application servers to search the dependent modules.
+%Dependencies of these modules are lost and they must be reconstructed.
+%However, these modules are still original versions.
+%Most of the work in redeploying dependent modules makes no sense except class loading in the modules.
+%Dependency management and reconstruction should be handled in the class loader.
+%Then dependent modules just need to reload the classes to reconstruct dependencies and most of the deployment process is omitted.
+%Updating efficiency is greatly improved.
+
+%Each class loader that represents each module should record which class loaders it depends on.
+%At the same time, the class loader of the depended module should record what depends on itself as the reverse dependencies.
+%So, each class loader may have one or more depended class loaders and dependent class loaders.
+%All the information is collected when classes are loaded at the first time and their class loaders maintenance these important dependency information. 
+%From an overall perspective, these module class loaders constitute a dependency graph.
+%Every vertex of this graph can be regard as a class loader or a related module and every edge represents a dependency from one class loader to another.
+
+%Generally, there should be a parent class loader called system class loader in each module class loader.
+%This parent class loader can be treated as a depended class loader because the original class really depends on the system class which loaded by its parent class loader.
+%Based on parent delegation and our dependency graph for module class loaders, our class loader architecture model is organized in both a class loader hierarchy and a class loader network\cite{class_loader_patent}.
+
+\begin{comment}
+As we know, class loader is an important concept in Java projects and application servers based on J2EE\cite{j2ee}.
+We implement to three safe and reliable module class loaders to support hot deployment of dependency reconstruction.
+They are Circle Dependency Reconstruction Class Loader(CDR Class Loader) with static dependency management, Adaptive Dependency Reconstruction Class Loader(ADR Class Loader) and Adaptive Dependency Reconstruction Delay Class Loader(ADRD Class Loader) with dynamic dependency management.
+Our customized class loaders not also complete basic class loading, but also maintain and reconstruct dependencies.
+Thus, hot deployment and dependency reconstruction becomes more flexible and efficient.
+\end{comment}
+
+%\subsection{Class loading with dependencies}
+
+%Static dependency management is based on profiles of modules. 
+%The profile describes the module information including dependencies and main classes. 
+%It is named after the module in order to manage the module with a unified identification. 
+%For example, a profile named \emph{Compute.xml} in the module Compute.jar records the dependencies of Compute.jar. 
+%So dependency graph is created by profiles of all the modules. 
+%The dependent class loaders will be set in the class loader of each module.
+
+
+
+
+
+
+
+\subsection{Constructing the dependency graph}
+
+Editing profiles of modules is a quite messy work when modular applications are composed of hundreds of modules.
+Dynamic dependency management avoids this work because it has a loading queue to make a try when loading classes.
+The loaded class will be placed in the repository and the unloaded class will enter the loading queue again to wait for the next loading.
+Due to continuous trying, we can obtain dependencies of all the classes(modules) by an adaptive way.
+The priority order of loading rules is described in the following:
+\begin{itemize}[\IEEEsetlabelwidth{9}]
+\item[1)] Try to use the system class loader to load it, if the class name begins with "java.".
+\item[2)] Try to use its own class loader to load it.
+\item[3)] Try to use its dependent class loaders to load it.
+\item[4)] Try to use the class loaders which have already loaded other classes in the repository. 
+\end{itemize}
+
+
+
+
+
+Fig.\ref{fig:loading_queue} shows the loading classes process of the division EJB application that we used before. 
+There are two classes \emph{ComputeBean} and \emph{ValidatorBean} in the application. 
+We put them into the loading queue and try to load \emph{ComputeBean} at first. 
+Due to the dependencies, module class loader $C$ which belongs to Compute.jar fails to load it. 
+Class \emph{ComputeBean} should go back to the loading queue again to wait the next loading, which is described as Fig.\ref{fig:subfig:a}. 
+Then it is turn to load Class \emph{ValidatorBean} in Fig.\ref{fig:subfig:b}. 
+Module class loader $V$ loads it successfully, so we add the class loader into repository. 
+With more classes loaded successfully, more class loaders will be put in the repository and they help to load other classes. 
+Thus, \emph{ComputeBean} can be loaded successfully at the second time by the class loader in the repository as presented in Fig.\ref{fig:subfig:c}.
+If a class loader in the repository loads the other class successfully, that means it is the dependent class loader of the other class loader and the dependency is created in the class loader incidentally. 
+Finally, the loading queue becomes empty and all the classes are loaded with the dependencies.
+Without static profiles, module class loaders create dependencies dynamically while loading classes, so we call this type of module class loader \emph{Adpative Class Loader}.
 
 \begin{figure*}[ht]
 \centering
@@ -363,30 +419,6 @@ The dependencies are managed in \emph{Circle Class Loaders} based on the static 
 \label{fig:loading_queue}
 \end{figure*}
 
-Editing profiles of modules is a quite messy work when modular applications are composed of hundreds of modules.
-Dynamic dependency management avoids this work because it has a loading queue to make a try when loading classes.
-The loaded class will be placed in the repository and the unloaded class will enter the loading queue again to wait for the next loading.
-Due to continuous trying, we can obtain dependencies of all the classes(modules) by an adaptive way.
-The priority order of loading rules is described in the following:
-\begin{itemize}[\IEEEsetlabelwidth{9}]
-\item[1)] Try to use the system class loader to load it, if the class name begins with "java.".
-\item[2)] Try to use its own class loader to load it.
-\item[3)] Try to use its dependent class loaders to load it.
-\item[4)] Try to use the class loaders which have already loaded other classes in the repository. 
-\end{itemize}
-
-Fig.\ref{fig:loading_queue} shows the loading classes process of the division EJB application that we used before. 
-There are two classes \emph{ComputeBean} and \emph{ValidatorBean} in the application. 
-We put them into the loading queue and try to load \emph{ComputeBean} at first. 
-Due to the dependencies, module class loader $C$ which belongs to Compute.jar fails to load it. 
-Class \emph{ComputeBean} should go back to the loading queue again to wait the next loading, which is described as Fig.\ref{fig:subfig:a}. 
-Then it is turn to load Class \emph{ValidatorBean} in Fig.\ref{fig:subfig:b}. 
-Module class loader $V$ loads it successfully, so we add the class loader into repository. 
-With more classes loaded successfully, more class loaders will be put in the repository and they help to load other classes. 
-Thus, \emph{ComputeBean} can be loaded successfully at the second time by the class loader in the repository as presented in Fig.\ref{fig:subfig:c}.
-If a class loader in the repository loads the other class successfully, that means it is the dependent class loader of the other class loader and the dependency is created in the class loader incidentally. 
-Finally, the loading queue becomes empty and all the classes are loaded with the dependencies.
-Without static profiles, module class loaders create dependencies dynamically while loading classes, so we call this type of module class loader \emph{Adpative Class Loader}.
 
 If hot deployment happens, the old version classes in the repository must be removed and their related dependencies must be dropped. 
 Then, the new version classes are also placed in the loading queue and the process is just like deployment process. 
@@ -407,7 +439,7 @@ The affected modules only update their module class loaders and the affected cla
 Even though adaptive way to load class is time consuming, avoiding editing dependencies in the profiles of modules is a time saving thing for developers of modular applications or administrators of application servers.
 
 
-\subsection{Class Loader with Lazy Reconstruction}
+\subsection{Lazy reconstruction}
 
 \begin{algorithm}[ht]
 \caption{function loadClass of \emph{Delay Class Loader}}
