@@ -59,14 +59,7 @@ lhc\_happy@sina.cn, \{caochun, yuping\}@nju.edu.cn}
 
 
 \begin{abstract}
-%\boldmath
-The hot deployment mechanism is a typical feature of mainstream application servers. 
-But current application servers only support hot deployment of standalone applications, which cannot satisfy the requirement of modular applications. 
-Failures will occur when some depended modules are updated online, which will result in failure of the whole application platform.
-To solve the problem, all the dependent modules must be redeployed in a manual or semi-automatic manner at the cost of increasing overhead after deployment of depended modules.
-So a new technology of hot deployment with dependency reconstruction is introduced in order to avoid the unnecessary redeployment.
-Dependency management and maintenance is placed in module class loaders, so that the cost of dependency reconstruction will be reduced.
-Experiments show that our technology of hot deployment can ensure the correctness of modular applications and operating efficiency of application servers will be highly improved.
+Hot deployment is a typical feature in mainstream application servers. But current application servers treat each module as standalone applications and may fail if a module of dependencies with other ones is hot deployed. The reason lies in that the dependencies among modules are not respected for current hot deployment mechanism. This paper investigates direct countermeasures that manage dependencies in application server deployment process. We argue that these measurements suffer from efficiency and infeasibility. In advance, we propose a class loading with dependency reconstruction and design the corresponding class loader. The class loader can construct the dependency automatically/heuristically and  ... Experiments show that our technology of hot deployment can ensure the correctness of modular applications and operating efficiency of application servers will be highly improved.
 \end{abstract}
 
 \begin{IEEEkeywords}
