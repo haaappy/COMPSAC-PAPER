@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2014.11.25)  16 JAN 2015 16:10
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2014.11.25)  19 JAN 2015 21:48
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -520,7 +520,7 @@ ion <1.6>, but at most version <1.5> allowed
 <ExampleJVM.pdf, id=102, 404.24374pt x 274.15623pt>
 File: ExampleJVM.pdf Graphic file (type pdf)
  <use ExampleJVM.pdf>
-Package pdftex.def Info: ExampleJVM.pdf used on input line 134.
+Package pdftex.def Info: ExampleJVM.pdf used on input line 124.
 (pdftex.def)             Requested size: 252.94499pt x 171.548pt.
 
 [2 <./JBossClassLoader.pdf> <./ExampleEJB.pdf
@@ -535,15 +535,15 @@ with page group included in a single page
 
 pdfTeX warning: pdflatex (file ./ExampleThree.pdf): PDF inclusion: found PDF ve
 rsion <1.6>, but at most version <1.5> allowed
-<ExampleThree.pdf, id=166, 237.07521pt x 157.4432pt>
+<ExampleThree.pdf, id=166, 235.85927pt x 157.4422pt>
 File: ExampleThree.pdf Graphic file (type pdf)
  <use ExampleThree.pdf>
-Package pdftex.def Info: ExampleThree.pdf used on input line 181.
-(pdftex.def)             Requested size: 158.99377pt x 105.59209pt.
+Package pdftex.def Info: ExampleThree.pdf used on input line 147.
+(pdftex.def)             Requested size: 158.99377pt x 106.13916pt.
 
 [3 <./ExampleThree.pdf>]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 271.
+put line 206.
 
 
 pdfTeX warning: pdflatex (file ./LoadingQueueA.pdf): PDF inclusion: found PDF v
@@ -551,7 +551,7 @@ ersion <1.6>, but at most version <1.5> allowed
 <LoadingQueueA.pdf, id=193, 229.17268pt x 145.28479pt>
 File: LoadingQueueA.pdf Graphic file (type pdf)
  <use LoadingQueueA.pdf>
-Package pdftex.def Info: LoadingQueueA.pdf used on input line 400.
+Package pdftex.def Info: LoadingQueueA.pdf used on input line 290.
 (pdftex.def)             Requested size: 159.59799pt x 101.17755pt.
 
 
@@ -560,7 +560,7 @@ ersion <1.6>, but at most version <1.5> allowed
 <LoadingQueueB.pdf, id=194, 229.78065pt x 150.75621pt>
 File: LoadingQueueB.pdf Graphic file (type pdf)
  <use LoadingQueueB.pdf>
-Package pdftex.def Info: LoadingQueueB.pdf used on input line 406.
+Package pdftex.def Info: LoadingQueueB.pdf used on input line 296.
 (pdftex.def)             Requested size: 154.21869pt x 101.17755pt.
 
 
@@ -569,7 +569,7 @@ ersion <1.6>, but at most version <1.5> allowed
 <LoadingQueueC.pdf, id=195, 282.05927pt x 151.3635pt>
 File: LoadingQueueC.pdf Graphic file (type pdf)
  <use LoadingQueueC.pdf>
-Package pdftex.def Info: LoadingQueueC.pdf used on input line 412.
+Package pdftex.def Info: LoadingQueueC.pdf used on input line 302.
 (pdftex.def)             Requested size: 188.54402pt x 101.17755pt.
 
 [4]
@@ -580,7 +580,7 @@ ound PDF version <1.6>, but at most version <1.5> allowed
 File: ProcessReconstructionCL.pdf Graphic file (type pdf)
 
 <use ProcessReconstructionCL.pdf>
-Package pdftex.def Info: ProcessReconstructionCL.pdf used on input line 439.
+Package pdftex.def Info: ProcessReconstructionCL.pdf used on input line 329.
 (pdftex.def)             Requested size: 144.54pt x 223.10669pt.
  [5 <./LoadingQueueA.pdf> <./LoadingQueueB.pdf
 
@@ -595,24 +595,24 @@ fs with page group included in a single page
 pdfTeX warning: pdflatex (file ./ProcessReconstructionCL.pdf): PDF inclusion: m
 ultiple pdfs with page group included in a single page
 >]
-Underfull \hbox (badness 1675) in paragraph at lines 575--576
+Underfull \hbox (badness 1675) in paragraph at lines 465--466
 []\OT1/ptm/m/n/10 AS: JBoss AS 5.1.0 & JBoss AS 5.1.0 ex-ten-
  []
 
 [6] [7]
-Underfull \hbox (badness 10000) in paragraph at lines 763--764
+Underfull \hbox (badness 10000) in paragraph at lines 654--655
 []\OT1/ptm/m/n/8 Oracle We-bLogic Server, []$http : / / www . oracle . com / te
 chnetwork /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 781--782
+Underfull \hbox (badness 10000) in paragraph at lines 672--673
 []\OT1/ptm/m/n/8 Java Vir-tual Ma-chine, []$http : / / java-[]virtual-[]machine
  . net /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 805--806
+Underfull \hbox (badness 10000) in paragraph at lines 696--697
 []\OT1/ptm/m/n/8 Java Pet Store, []$http : / / www . oracle . com / technetwork
  / java /
  []
@@ -624,7 +624,7 @@ Missing character: There is no   in font ptmr7t!
 Missing character: There is no Â in font ptmr7t!
 Missing character: There is no   in font ptmr7t!
 
-Underfull \hbox (badness 1910) in paragraph at lines 834--835
+Underfull \hbox (badness 1910) in paragraph at lines 725--726
 []\OT1/ptm/m/n/8 Dornemann, Kay, and Bernd Freisleben. "Dis-cov-er-ing Grid Re-
 
  []
@@ -660,7 +660,7 @@ Missing character: There is no ± in font ptmr7t!
 Missing character: There is no Â in font ptmr7t!
 Missing character: There is no   in font ptmr7t!
 
-Underfull \hbox (badness 6157) in paragraph at lines 864--865
+Underfull \hbox (badness 6157) in paragraph at lines 755--756
 \OT1/ptm/m/n/8 "Op-ti-miz-ing OSGi Ser-vices on Gate-ways."Ambient Intelligence
 -
  []
@@ -678,7 +678,7 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 873.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 764.
 Extra height:0.0pt when 678.26144pt
 (2)Left:678.26144pt Right:681.12793pt Output:678.26144pt
 (2)Left:681.12793pt Right:681.12793pt Output:681.12793pt
@@ -688,18 +688,18 @@ Left:681.12793pt
 Right:681.12793pt
 Output:681.12793pt
 [8]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 873.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 764.
  (./compsac.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 873.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 873.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 764.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 764.
 Package rerunfilecheck Info: File `compsac.out' has not changed.
 (rerunfilecheck)             Checksum: 4DB0A335E55BEACBAEA7BEA62A589CE0;1101.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 873.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 764.
  ) 
 Here is how much of TeX's memory you used:
  8454 strings out of 493488
  128524 string characters out of 3141346
- 251308 words of memory out of 3000000
+ 251332 words of memory out of 3000000
  11557 multiletter control sequences out of 15000+200000
  40640 words of font info for 77 fonts, out of 3000000 for 9000
  960 hyphenation exceptions out of 8191
@@ -719,7 +719,7 @@ e/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2
 ist/fonts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/2012/texmf-dist/fonts
 /type1/urw/times/utmr8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw
 /times/utmri8a.pfb>
-Output written on compsac.pdf (8 pages, 1074305 bytes).
+Output written on compsac.pdf (8 pages, 1075423 bytes).
 PDF statistics:
  494 PDF objects out of 1000 (max. 8388607)
  425 compressed objects within 5 object streams
