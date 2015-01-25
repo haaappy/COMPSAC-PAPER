@@ -48,10 +48,10 @@
 
 \title{Hot Deployment with Dependency Reconstruction}
 
-\author{\IEEEauthorblockN{Haicheng Li, Chun Cao,  Ping Yu}
+\author{\IEEEauthorblockN{Haicheng Li, Chun Cao,  Xianping Tao}
 \IEEEauthorblockA{State Key Lab for Novel Software Technology, Nanjing University, Nanjing, China\\
 Dept. of Computer Science and Technology, Nanjing University, Nanjing, China\\
-lhc\_happy@sina.cn, \{caochun, yuping\}@nju.edu.cn}
+lhc\_happy@sina.cn, \{caochun, txp\}@nju.edu.cn}
 }
 
 % make the title area
@@ -81,14 +81,11 @@ Applications in multiple packages, which are called as \emph{modular application
 
 To solve the problem, the dependencies need to be reconstructed. Intuitively, this can be done manually. The developer should have the knowledge of dependent configuration among the application modules and be aware of the affection scope of the redeployment. Then they can redeploy the dependent ones by hand. However, this requires human intervention which can be strenuous and even error-prone, especially for large-scale applications. Alternatively, they can also redeploy all the modules for that application. But it not only is unnecessary, but also causes the state of unaffected part to be destructed, such as the data storage module which is hardly updated. 
 
-In this paper, we introduce a general approach to enable the correct hot deployment respecting the dependencies among modules. The dependencies which are constructed with class loaders for the modules and upon the dependent modules can be calculated. Their hot deployment can be triggered when depended modules are hot deployed. In order to update flexibly and efficiently, we can obtain and manage dependencies from the dynamic way with lazy reconstruction during hot deployment, so that the dependent modules only update their class loaders and they don't need to do anything else except class loading in the process of redeployment. Experiments show that the problems of calling failure can be solved through this technology and the efficiency of application servers is improved.
+In this paper, we introduce a general approach to enable the correct hot deployment  with module class loaders that respects the dependencies among modules. The dependencies are constructed automatically during module loading and dependency reconstruction is triggered when any modules being depended by others is replaced with a new version at runtime. We further propose a lazy reconstruction approach for better performance. Experiments show that the partial update of the modular applications can be carried out through this technology correctly and efficiently.
 
 The rest of this paper is organized as follow. 
-Section \ref{sec:background} reviews the hot deployment mechanisms and analyzes the reasons of failures based on the hot deployment mechanisms. 
-Section \ref{sec:reconstructionAS} describes dependency reconstruction in application servers, which is a common approach to solve dependency lost.
-And Section \ref{sec:reconstructionCL} presents a more effective approach of dependency reconstruction with class loaders.
-We give the evaluations in Section \ref{sec:evaluation} and Section \ref{sec:relatedwork} is the related work.
-Lastly in Section \ref{sec:conclusion}, we conclude this paper and discuss future work.
+Section \ref{sec:background} reviews the hot deployment mechanisms and analyzes the reasons of failures based on the hot deployment mechanisms. Section \ref{sec:reconstructionAS} describes dependency reconstruction in application servers. And Section \ref{sec:reconstructionCL} presents a more effective approach of dependency reconstruction with class loaders.
+We give the evaluations in Section \ref{sec:evaluation} and Section \ref{sec:relatedwork} is the related work. Lastly in Section \ref{sec:conclusion}, we conclude this paper and discuss future work.
 
 
 
