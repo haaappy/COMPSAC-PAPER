@@ -170,9 +170,9 @@ So, it is more direct to have the class loaders to maintain the dependencies amo
 Designing a class loading mechanism for modular applications involves three basic considerations. Firstly, the loader should be able to load the classes in the modules correctly. Secondly, the loader should be able to resolve the dependencies among classes from different modules. Lastly, the loaders should be able to reconstruct the dependencies upon some of the modules are update later. 
 The loading process for one module can be defined as three steps:
 \begin{itemize}
-\item Try use the system loaders to load
-\item Try use its dependent class loaders to load
-\item Try use itself to load
+\item Try to use the system loaders to load
+\item Try to use its dependent class loaders to load
+\item Try to use itself to load
 \end{itemize}
 
 The first step is in charge of the loading of fundamental classes, such as those in java.*, with system class loaders respecting the parent delegation policy \cite{parent_delegation}. By this means, the safety and uniqueness of system classes will be guaranteed. This loading strategy gives priority to load classes by parent class loader. If the loading class is not a fundamental class, the class loader will try to load it by itself. The classes in the same module are visible to each other. But they may have references to the classes that come from different modules, the class loader should delegate the dependent class loaders to resolve the classes for it. We regard the system class loader as a dependent class loader of each module class loader, so that class loaders should use dependent class loaders to load classes before using itself.
@@ -221,9 +221,9 @@ The loaded class instance: $c$
 
 Algorithm \ref{alg:module_class_loader} shows the module class loader how to load classes in modular applications.
 In modular applications, a module can be defined as $M=<C, L, R>$. 
-$C=\{c_1, c_2, c_3\cdots\}$ is the set of classes in that module. 
+$C=\{c_1, c_2, c_3\cdots\}$ is a set of classes in that module. 
 $L$ is a module class loader to load all the classes in the class set $C$.
-$R=\{M_1, M_2, M_3\cdots\}$ is the set of its dependencies against other modules. 
+$R=\{M_1, M_2, M_3\cdots\}$ is a set of its dependencies against other modules. 
 They are determined from the dependency graph, which can be created by the static module profiles before class loading.
 Moreover, we can obtain the dependent class loader list of $L$ from each class loader of each module in $R$, which represents \emph{depList} in Algorithm \ref{alg:module_class_loader}. 
 The module class loaders may delegate each other due to the \emph{depList} with circles, which will cause endless loop.
@@ -566,7 +566,7 @@ They involved a number of fields, such as distributed applications, design patte
 
 Improving abilities of application servers through component extension is not a new idea.
 For example, Li, et al. advocated an on demand approach of deploying services in application servers \cite{related_AS_1} and they even proposed an approach to make an application server well-structured and dynamic \cite{related_AS_2}.
-And some research focused on refactoring application servers according to application requirements \cite{related_AS_3}.
+And some research focused on refactoring application servers according to application requirements \cite{related_AS_3, related_AS_4}.
 
 Our work proposes a technology of hot deployment with dependency reconstruction, which makes hot deployment more flexible and efficient.
 By this technology, we solve the problems of calling failure when only depended modules are updated. 
@@ -590,7 +590,7 @@ Moreover, we will implement dependency reconstruction in the code level \cite{fu
 % conference papers do not normally have an appendix
 % use section* for acknowledgement
 \section*{Acknowledgment}
-This work is partially supported by National Basic Research 973 Program(Grant No. 2015CB352202), and National Natural Science Foundation(Grant Nos. 61472177, 91318301, 61321491, 61361120097) of China.
+This work was partially supported by the National 863 project under the Grant 2013AA01A213 and the NSFC under Grants 91318301, 61321491.
 
 % may modify acknowledgment
 
@@ -639,7 +639,7 @@ Fowler, Martin. "Inversion of control containers and the dependency injection pa
 %Olliges, Sascha. Runtime Reconfiguration in J2EE Systems. Diss. Master Thesis supervised by Jasminka Matevska and Wilhelm Hasselbring, University of Oldenburg, Germany, Department of Computing Science, Software Engineering Group, 2005.
 
 \bibitem{parent_delegation}
-Rohit Chaudhri. "Understnding the Java Classloading Mechanism." Java Developer's Journal Vol.8, Issue 8, p.16.
+Rohit Chaudhri. "Understanding the Java Classloading Mechanism." Java Developer's Journal Vol.8, Issue 8, p.16.
 
 %\bibitem{class_loader_patent}
 %Meduri, Subbarao K., Thomas Edward Musta, and James Lee Van Oosten. "Collaborative classloader system and method." U.S. Patent No. 7,870,546. 11 Jan. 2011.
@@ -702,6 +702,9 @@ You, Chao, et al. "Towards a well structured and dynamic application server."Com
 
 \bibitem{related_AS_3}
 Zhang, Charles, Dapeng Gao, and Hans-Arno Jacobsen. "Towards just-in-time middleware architectures." Proceedings of the 4th international conference on Aspect-oriented software development. ACM, 2005.
+
+\bibitem{related_AS_4}
+Cao, Chun, et al. "Toward a seamless adaptation platform for Internetware." Science China Information Sciences 56.8 (2013): 1-13.
 
 \bibitem{related_split}
 Sánchez, Iván Bernabé, Daniel Díaz-Sánchez, and Mario Muñoz-Organero. "Optimizing OSGi Services on Gateways." Ambient Intelligence-Software and Applications. Springer International Publishing, 2013. 155-162.
